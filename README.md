@@ -23,5 +23,5 @@ Open DwarvenAccent.lua in a text editor and edit REPLACEMENTS near the top.
 Each entry is { "what you type", "what it becomes" }.
 Use lowercase source phrases. Longer phrases are automatically applied first.
 
-The addon deliberately leaves slash commands alone. It does not modify incoming
+The addon deliberately leaves slash commands and all text within [brackets] alone. It does not modify incoming
 chat or other players' messages.
