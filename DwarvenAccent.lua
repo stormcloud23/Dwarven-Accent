@@ -8,7 +8,6 @@
 --   /da test ... Preview a transformation without sending it
 --
 -- Add or edit entries in REPLACEMENTS below. Longer phrases are applied first.
--- This addon uses the modern pre-send callback used by WoW's 12.x UI.
 -- Because Forever is evolving, verify the callback in your current client.
 
 local ADDON_NAME = ...
