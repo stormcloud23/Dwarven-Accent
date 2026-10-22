@@ -1,0 +1,7 @@
+## Interface: 16001
+## Title: Dwarven Accent
+## Notes: Adds a light Scots-inspired voice to your outgoing chat.
+## Author: Stormcloud23
+## Version: 1.0
+
+DwarvenAccent.lua
