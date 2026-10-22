@@ -182,20 +182,52 @@ local function ReplacePhrase(text, source, replacement)
     return table.concat(result)
 end
 
+-- Transform ordinary text while leaving bracketed content untouched.
+local function TransformPlainText(text)
+    for _, entry in ipairs(REPLACEMENTS) do
+        text = ReplacePhrase(text, entry[1], entry[2])
+    end
+    return text
+end
+
 local function Transform(text)
     if not text or text == "" then
         return text
     end
 
-    -- Avoid rewriting slash commands. This also keeps addon commands intact.
+    -- Don't rewrite slash commands.
     if text:sub(1, 1) == "/" then
         return text
     end
 
-    for _, entry in ipairs(REPLACEMENTS) do
-        text = ReplacePhrase(text, entry[1], entry[2])
+    local result = {}
+    local cursor = 1
+
+    while cursor <= #text do
+        -- Find the next balanced [ ... ] section.
+        local openPos, closePos = text:find("%b[]", cursor)
+
+        if not openPos then
+            -- No more bracketed sections: transform the remaining text.
+            result[#result + 1] =
+                TransformPlainText(text:sub(cursor))
+            break
+        end
+
+        -- Transform text before the bracketed section.
+        if openPos > cursor then
+            result[#result + 1] =
+                TransformPlainText(text:sub(cursor, openPos - 1))
+        end
+
+        -- Copy the bracketed section exactly as-is.
+        result[#result + 1] = text:sub(openPos, closePos)
+
+        -- Continue after the closing bracket.
+        cursor = closePos + 1
     end
-    return text
+
+    return table.concat(result)
 end
 
 local function Print(message)
