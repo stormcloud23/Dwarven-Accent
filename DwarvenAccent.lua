@@ -124,7 +124,7 @@ local REPLACEMENTS = {
     { "friend", "freend" },
     { "of", "o'" },
     { "oh", "ah" },
-    { "i", "ah" }
+    { "i", "ah" },
 }
 
 -- Sort longest source phrase first so "I don't know" wins over "know".
