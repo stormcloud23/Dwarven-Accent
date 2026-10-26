@@ -165,6 +165,23 @@ local function ContextReplacement(rule, lower, first, last)
         -- 'fash' is primarily 'bother/trouble (someone)', not a blanket
         -- translation of the noun 'trouble' or 'worry about the future'.
         return nextWord and FASH_OBJECTS[nextWord] and rule.replacement or nil
+    elseif context == "miss_address" then
+        -- Only rewrite an explicit form of address. 'I miss you', 'miss the
+        -- shot', 'that's a miss', and the title 'Miss Smith' must stay intact.
+        local before = lower:sub(1, first - 1)
+        local after = lower:sub(last + 1)
+        local isPause = after:match("^%s*[,!?.]") ~= nil or after:match("^%s*$") ~= nil
+        if not isPause then return nil end
+        local preceding = PreviousWord(lower, first)
+        local addressOpening = preceding == "hello" or preceding == "hi"
+            or preceding == "hey" or preceding == "greetings"
+        local addressedAfterComma = before:match(",%s*$") ~= nil
+        local addressedAtStart = before:match("^%s*$") ~= nil
+            and after:match("^%s*,") ~= nil
+        local politeAddress = before:match("excuse%s+me%s*$") ~= nil
+            or before:match("pardon%s+me%s*$") ~= nil
+        return (addressOpening or addressedAfterComma or addressedAtStart
+            or politeAddress) and rule.replacement or nil
     elseif context == "man_noun" then
         -- 'Man the cannons!' must never become 'Lad the cannons!'
         return (not nextWord or not MAN_VERB_FOLLOWERS[nextWord])

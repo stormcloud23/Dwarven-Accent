@@ -35,6 +35,18 @@
       case 'intensifier': return next && sets.EMPHASIS_ADJECTIVES.has(next) ? rule.replacement : null;
       case 'crazy_description': return !next || sets.CRAZY_NOUNS.has(next) ? rule.replacement : null;
       case 'fash_verb': return next && sets.FASH_OBJECTS.has(next) ? rule.replacement : null;
+      case 'miss_address': {
+        // Keep speech addresses, not 'miss the shot', 'I miss you' or 'a miss'.
+        const before=lower.slice(0,first), after=lower.slice(last);
+        const isPause=/^\s*[,!?.]/.test(after) || /^\s*$/.test(after);
+        if (!isPause) return null;
+        const prev=previousWord(lower,first);
+        const greeting=['hello','hi','hey','greetings'].includes(prev);
+        const afterComma=/,\s*$/.test(before);
+        const atStart=/^\s*$/.test(before) && /^\s*,/.test(after);
+        const polite=/(?:excuse|pardon)\s+me\s*$/.test(before);
+        return (greeting || afterComma || atStart || polite) ? rule.replacement : null;
+      }
       case 'man_noun': return !next || !sets.MAN_VERB_FOLLOWERS.has(next) ? rule.replacement : null;
       case 'bare_only': return (lower[last] !== "'" && lower[last] !== '’') ? rule.replacement : null;
       case 'body_part': { const prev = previousWord(lower,first); return prev && sets.BODY_PART_PRECEDERS.has(prev) ? rule.replacement : null; }

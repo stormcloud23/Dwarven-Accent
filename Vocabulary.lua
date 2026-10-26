@@ -116,8 +116,12 @@ Add("slang", 3, "friend", "freend")
 Add("slang", 3, "nothing", "naething")
 Add("slang", 3, "man", "lad", "man_noun")
 Add("slang", 3, "boy", "laddy")
+Add("slang", 3, "boys", "lads")
 Add("slang", 3, "woman", "lass")
 Add("slang", 3, "girl", "lassy")
+Add("slang", 3, "girls", "lasses")
+-- 'miss' is an honorific / form of address ONLY; not the verb or a failed attack.
+Add("slang", 3, "miss", "lass", "miss_address")
 
 Add("everyday", 2, "with", "wi'")
 Add("everyday", 2, "without", "wi'oot")

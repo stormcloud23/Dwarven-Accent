@@ -28,7 +28,26 @@ assert.ok(generated.phrases.some(p=>p.category==='Protected text' && p.text.incl
 assert.ok(generated.phrases.some(p=>p.text==='Good evening, boys and girls.'),
     'Greetings must contain untranslated boys and girls');
 
-assert.equal(generated.rules.length,107,'Expected complete vocabulary');
+assert.equal(generated.rules.length,110,'Expected complete vocabulary');
+const revised = [
+  ['Hello, miss. Do you need a hand?', "Hello, lass. D'ye need a hand?"],
+  ['Good evening, boys and girls.', 'Good evening, lads and lasses.'],
+  ['That old man owes me a drink.', "Tha' old lad owes me a drink."],
+];
+for (const [original, expected] of revised) {
+  const result=engine.transform(original,{preset:'Heavy'});
+  assert.equal(result.text,expected,'Revised natural-language corpus must exercise actual vocabulary');
+}
+for (const [original, expected] of [
+  ['Hey miss, are you hurt?', 'Hey lass, are ye hurt?'],
+  ['I miss you.', 'Ah miss ye.'],
+  ['I missed the shot.', 'Ah missed the shot.'],
+  ['That was a miss, not a hit.', "Tha' was a miss, not a hit."],
+  ['Miss the shot and we lose.', 'Miss the shot and we lose.'],
+  ['Miss Smith is waiting.', 'Miss Smith is waiting.'],
+]) assert.equal(engine.transform(original,{preset:'Heavy'}).text,expected,
+                'Context-sensitive address rule: '+original);
+
 const edges = [
     '[[you] friend] yes',
     'You |TInterface\\Icons\\INV_Misc_QuestionMark:0|t are my friend',

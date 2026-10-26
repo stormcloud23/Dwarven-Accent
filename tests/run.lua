@@ -153,6 +153,7 @@ eq(transform("((No idea, pretty lass)) no time"),
 local validContext = {
     appearance = true, intensifier = true, crazy_description = true,
     fash_verb = true, man_noun = true, body_part = true, no_form = true, bare_only = true,
+    miss_address = true,
 }
 local contextCount = 0
 for _, rule in ipairs(DA.Rules) do
@@ -198,5 +199,41 @@ for _, name in ipairs({"Subtle", "Balanced", "Heavy"}) do
     eq(cappedCount, 4, name .. " reports capped substitution count")
     assert(DA.Presets[name].limit == 0, name .. " preset must default to unlimited")
 end
+-- Revisions to the source fixture corpus: check the new words actually translate.
+eq(transform("Hello, miss. Do you need a hand?"),
+    "Hello, lass. D'ye need a hand?", "miss as polite form of address")
+eq(transform("Good evening, boys and girls."),
+    "Good evening, lads and lasses.", "plural boys and girls")
+eq(transform("That's a pretty good story, young man."),
+    "That's a pretty good story, young lad.", "young man already handled")
+eq(transform("That old man owes me a drink."),
+    "Tha' old lad owes me a drink.", "old man already handled")
+eq(transform("The young man studies the map carefully."),
+    "The young lad studies the map carefully.", "another man noun")
+-- Positive vocative contexts and negative cases: avoid confusing noun/verb 'miss'.
+eq(transform("Hey miss, are you hurt?"),
+    "Hey lass, are ye hurt?", "greeting without comma")
+eq(transform("Excuse me miss!"),
+    "Excuse me lass!", "polite address without comma")
+eq(transform("Miss, do you know the way?"),
+    "Lass, d'ye ken the way?", "direct address at start")
+eq(transform("Thank you, miss!"),
+    "Thank ye, lass!", "vocative following comma")
+eq(transform("I miss you."),
+    "Ah miss ye.", "miss as verb must not change")
+eq(transform("I missed the shot."),
+    "Ah missed the shot.", "missed is separate word")
+eq(transform("Miss the shot and we lose."),
+    "Miss the shot and we lose.", "imperative miss must not change")
+eq(transform("That was a miss, not a hit."),
+    "Tha' was a miss, not a hit.", "miss as failure noun must not change")
+eq(transform("I think I will miss the target."),
+    "Ah think Ah will miss the target.", "future-tense miss verb must not change")
+eq(transform("Miss Smith is waiting."),
+    "Miss Smith is waiting.", "title preceding surname preserved")
+eq(DA.Transform("Hello, miss!", {preset="Balanced"}),
+    "Hello, miss!", "vocative miss is Heavy-only")
+eq(DA.Transform("Good evening, boys and girls.", {preset="Balanced"}),
+    "Good evening, boys and girls.", "plural forms are Heavy-only")
 print("PASS: Advanced 1.3 translation suite (" .. count .. " assertions; "
     .. contextCount .. " context-aware rules)")

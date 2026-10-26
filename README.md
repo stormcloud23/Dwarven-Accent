@@ -96,6 +96,12 @@ browser means its translation depends on nearby words.
 - **Pretty/beautiful → bonnie** only for a curated list of visual descriptions,
   optionally after one or two visual modifiers (`pretty little village`), not
   in `pretty sure`, `pretty good`, or `beautiful solution`.
+- **Miss → lass** only as a form of address (e.g., `Hello, miss`), not as
+  the verb (`I miss you`), a failed attack (`that was a miss`), or a title before
+  someone's surname (`Miss Smith`). **Boys → lads** and **girls → lasses** are
+  now included at Heavy tier, so the revised, unaccented test corpus exercises
+  these vocabulary rules. `Young man`/`old man` already use the contextual
+  `man → lad` rule.
 - **No → naw/nae** only in recognizable contexts: `No!` → `Naw!` but
   `no gold` → `nae gold`. Ambiguous uses like `no one` remain unchanged.
 - **Worry/bother/trouble → fash** only when it takes a personal object (or as
