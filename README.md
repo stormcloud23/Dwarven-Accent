@@ -145,7 +145,7 @@ remains unchanged.
 
 There is **no npm build, server, API key, or external hosting dependency**. Updates to `advanced/docs` automatically redeploy after Pages is enabled. These browser files are *not loaded by WoW* and do not alter the Simple branch. The review app uses a JavaScript port of the actual Lua engine; [CI checks](tests/review_web.test.js) ensure the two produce identical outputs across the full dialogue corpus and several extra edge cases.
 
-To add dialogue examples, edit [`tools/phrases.tsv`](tools/phrases.tsv), one category/tab/phrase per line. After changing `Vocabulary.lua`, the context tables in `Core.lua`, or the phrase corpus, regenerate the browser data:
+To add dialogue examples, edit [`tools/phrases.tsv`](tools/phrases.tsv), one category/tab/phrase per line. Source phrases should be ordinary, unaccented English (e.g. **boys and girls**, not **lads and lasses**); protected text fixtures intentionally keep their exact link names. The browser/Lua test also checks for accidentally pretranslated source dialogue. Existing phrase IDs stay in place when wording is corrected, so previously exported review IDs remain stable. After changing `Vocabulary.lua`, the context tables in `Core.lua`, or the phrase corpus, regenerate the browser data:
 
 ```bash
 python3 tools/build_review_data.py

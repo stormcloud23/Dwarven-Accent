@@ -12,6 +12,22 @@ const generated=global.DWARVEN_DATA;
 const phraseFile=fs.readFileSync('tools/phrases.tsv','utf8');
 const fromTsv=phraseFile.split(/\r?\n/).filter(x=>x && !x.startsWith('#')).map(x=>x.slice(x.indexOf('\t')+1));
 assert.deepEqual(generated.phrases.map(p=>p.text),fromTsv,'Web corpus must equal TSV source');
+
+// The library represents ordinary English before accent conversion.
+ // Already-accented input hides missing or awkward rewrite behavior.
+ // Protected item/spell names intentionally retain their exact wording.
+const accentWords = /\b(?:lad|lads|lass|lasses|lassy|laddy|bonnie|wee|aye|nae|naw|och|ken|dinnae|cannae|fash|freend|numpty|barmy|daft|shite|aboot|ower|yersel|yer)\b/i;
+for (const entry of generated.phrases) {
+    if (entry.category !== 'Protected text') {
+        assert.doesNotMatch(entry.text,accentWords,
+            `Phrase ${entry.id} should start in ordinary English, not pretranslated dialect`);
+    }
+}
+assert.ok(generated.phrases.some(p=>p.category==='Protected text' && p.text.includes('[The Pretty Lass]')),
+    'Protected item-name example must remain intact');
+assert.ok(generated.phrases.some(p=>p.text==='Good evening, boys and girls.'),
+    'Greetings must contain untranslated boys and girls');
+
 assert.equal(generated.rules.length,107,'Expected complete vocabulary');
 const edges = [
     '[[you] friend] yes',
