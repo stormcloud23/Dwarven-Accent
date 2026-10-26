@@ -1,7 +1,11 @@
 ## Interface: 16001
-## Title: Dwarven Accent
-## Notes: Adds a light Scots-inspired voice to your outgoing chat.
+## Title: Dwarven Accent |cffd4a760Advanced|r
+## Notes: Configurable, RP-friendly Scots-inspired voice for outgoing chat.
 ## Author: Stormcloud23
-## Version: 1.0
+## Version: 1.1.0
+## SavedVariables: DwarvenAccentDB
 
+Vocabulary.lua
+Core.lua
+Options.lua
 DwarvenAccent.lua
