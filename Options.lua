@@ -1,4 +1,4 @@
--- Dwarven Accent Advanced 1.2: compact in-game settings; no UI libraries.
+-- Dwarven Accent Advanced 1.3: compact in-game settings; no UI libraries.
 -- Only 11 vocabulary controls are constructed, however large the dictionary grows.
 local _, DA = ...
 local window, filterBox, previewBox, previewOutput, countLabel, pageLabel, matchLabel
@@ -64,7 +64,7 @@ local function MakeWindow()
     window:SetScript("OnDragStart", function(self) self:StartMoving() end)
     window:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
     window:Hide()
-    if window.TitleText then window.TitleText:SetText("Dwarven Accent - Advanced 1.2") end
+    if window.TitleText then window.TitleText:SetText("Dwarven Accent - Advanced 1.3") end
     if UISpecialFrames then table.insert(UISpecialFrames, "DwarvenAccentConfigFrame") end
 
     enabledCheck = Check(window, 19, -40, "Enable outgoing accent", function(value)
@@ -103,7 +103,7 @@ local function MakeWindow()
             end)
     end
     Label(window, "Individual vocabulary", 288, -43, "GameFontNormalLarge")
-    Label(window, "Search translations, including their categories.", 290, -69,
+    Label(window, "Search vocabulary; * marks context-sensitive rules.", 290, -69,
         "GameFontHighlightSmall")
     filterBox = CreateFrame("EditBox", nil, window, "InputBoxTemplate")
     filterBox:SetSize(432, 24)
@@ -212,7 +212,8 @@ Refresh = function(previewOnly)
             row.check:Show()
             row.text:Show()
             row.check:SetChecked(db.disabledRules[rule.source] ~= true)
-            row.text:SetText(rule.source .. "  ->  " .. rule.replacement .. "  [" .. rule.tier .. "]")
+            row.text:SetText(rule.source .. "  ->  " .. rule.replacement .. "  [" .. rule.tier .. "]"
+                .. (rule.context and " *" or ""))
             local active = rule.tier <= DA.Presets[db.preset].tier
                 and db.categories[rule.category] ~= false
             row.text:SetAlpha(active and 1 or 0.45)

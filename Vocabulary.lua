@@ -1,4 +1,4 @@
--- Dwarven Accent Advanced 1.2: curated vocabulary, from the original 1.0 rules.
+-- Dwarven Accent Advanced 1.3: curated vocabulary, from the original 1.0 rules.
 -- Tier 1 = Subtle; tier 2 = Balanced; tier 3 = Heavy only.
 -- Every source string is a stable identifier for the individual rule toggle.
 local _, DA = ...
@@ -14,12 +14,13 @@ DA.Categories = {
 }
 
 local entries = {}
-local function Add(category, tier, source, replacement)
+local function Add(category, tier, source, replacement, context)
     entries[#entries + 1] = {
         category = category,
         tier = tier,
         source = source,
         replacement = replacement,
+        context = context, -- optional, declarative grammatical safeguard
     }
 end
 
@@ -104,16 +105,16 @@ Add("slang", 2, "silly", "daft")
 Add("slang", 2, "idiot", "numpty")
 Add("slang", 2, "moron", "numpty")
 Add("slang", 2, "before", "afore")
-Add("slang", 2, "crazy", "barmy")
+Add("slang", 2, "crazy", "barmy", "crazy_description")
 Add("slang", 2, "tired", "knackered")
-Add("slang", 2, "worry", "fash")
-Add("slang", 3, "trouble", "fash")
-Add("slang", 3, "bother", "fash")
-Add("slang", 3, "pretty", "bonnie")
-Add("slang", 2, "beautiful", "bonnie")
+Add("slang", 2, "worry", "fash", "fash_verb")
+Add("slang", 3, "trouble", "fash", "fash_verb")
+Add("slang", 3, "bother", "fash", "fash_verb")
+Add("slang", 3, "pretty", "bonnie", "appearance")
+Add("slang", 2, "beautiful", "bonnie", "appearance")
 Add("slang", 3, "friend", "freend")
 Add("slang", 3, "nothing", "naething")
-Add("slang", 3, "man", "lad")
+Add("slang", 3, "man", "lad", "man_noun")
 Add("slang", 3, "boy", "laddy")
 Add("slang", 3, "woman", "lass")
 Add("slang", 3, "girl", "lassy")
@@ -123,18 +124,18 @@ Add("everyday", 2, "without", "wi'oot")
 Add("everyday", 2, "over", "ower")
 Add("everyday", 2, "gonna", "gonnae")
 Add("everyday", 2, "gotta", "hae tae")
-Add("everyday", 2, "wanna", "fancy tae")
+Add("everyday", 2, "wanna", "want tae")
 Add("everyday", 2, "kinda", "sortae")
-Add("everyday", 3, "that", "tha'")
+Add("everyday", 3, "that", "tha'", "bare_only")
 Add("everyday", 3, "about", "aboot")
 Add("everyday", 3, "because", "cause")
 Add("everyday", 3, "though", "tho")
 Add("everyday", 3, "of", "o'")
-Add("strong", 3, "very", "bloody")
-Add("everyday", 3, "no", "naw")
+Add("strong", 3, "very", "bloody", "intensifier")
+Add("everyday", 3, "no", "naw", "no_form")
 
 Add("exclamations", 2, "oh", "och")
 Add("strong", 3, "shit", "shite")
-Add("strong", 3, "ass", "arse")
+Add("strong", 3, "ass", "arse", "body_part")
 
 DA.Rules = entries

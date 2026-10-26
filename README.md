@@ -1,10 +1,10 @@
-# Dwarven Accent — Advanced 1.2 (pre-release)
+# Dwarven Accent — Advanced 1.3 (pre-release)
 
 A configurable, lightweight, RP-friendly Scots-inspired outgoing chat addon for **World of Warcraft: Forever**. Accent comes from predictable vocabulary choices, **not** random catchphrases or intrusive message rewriting.
 
 ## Pick your edition
 
-- **[Advanced 1.2 ZIP](https://github.com/stormcloud23/Dwarven-Accent/archive/refs/heads/advanced.zip)** — this branch, features below.
+- **[Advanced 1.3 ZIP](https://github.com/stormcloud23/Dwarven-Accent/archive/refs/heads/advanced.zip)** — this branch, features below.
 - **[Simple 1.0 ZIP](https://github.com/stormcloud23/Dwarven-Accent/archive/refs/heads/main.zip)** — the original working beta-tested version. It remains untouched.
 
 Both editions share one addon name, one `/da` command, and one installation directory. **Only install one edition at a time.**
@@ -50,7 +50,7 @@ Settings are stored account-wide in the game's `DwarvenAccentDB` SavedVariables.
 - Applies a deterministic preset and message substitution cap — no random variability across identical inputs.
 - Preserves `((OOC text))` (including unfinished OOC blocks), `[bracketed text]`, full item/spell links, texture/atlas markup, `http(s)`/`www` URLs, and outgoing slash commands.
 - Preserves single-letter `I` capitalization: `I` becomes `Ah`, not `AH`.
-- Avoids awkward `pretty fast` / `pretty sure` → `bonnie fast` / `bonnie sure`. `pretty` is now a Heavy-only rule used only before a small curated set of visibly descriptive nouns.
+- Avoids awkward `pretty fast` / `pretty sure` → `bonnie fast` / `bonnie sure`. `pretty` remains a Heavy-only rule and now recognizes an optional descriptive modifier before a visual noun.
 - Reclassifies `friend`, `trouble`, `bother`, and the `very` → `bloody` rule as Heavy only; `oh` translates to `och` at Balanced/Heavy.
 - Never changes incoming chat or generates new phrases on its own.
 
@@ -85,3 +85,31 @@ These mock tests cannot prove that the release client will accept the `.toc` int
 `Vocabulary.lua` holds categories and tiers, `Core.lua` owns matching and SavedVariables handling, `Options.lua` implements the UI, and `DwarvenAccent.lua` is the integration point. Do not merge the advanced branch into `main` unless explicitly requested.
 
 Useful API references: [WoW Settings panels](https://warcraft.wiki.gg/wiki/Creating_a_settings_menu), [WoW hyperlink structure](https://warcraft.wiki.gg/wiki/Hyperlinks).
+
+## Context-sensitive vocabulary (Advanced 1.3)
+
+The core uses a **small, deterministic set of grammar hints** for ambiguous
+words; it does not guess with random percentages or depend on external services.
+Most rules remain unconditional. A star (`*`) beside a rule in the vocabulary
+browser means its translation depends on nearby words.
+
+- **Pretty/beautiful → bonnie** only for a curated list of visual descriptions,
+  optionally after one or two visual modifiers (`pretty little village`), not
+  in `pretty sure`, `pretty good`, or `beautiful solution`.
+- **No → naw/nae** only in recognizable contexts: `No!` → `Naw!` but
+  `no gold` → `nae gold`. Ambiguous uses like `no one` remain unchanged.
+- **Worry/bother/trouble → fash** only when it takes a personal object (or as
+  part of the existing `don't worry` idiom). Noun `trouble` stays untouched.
+- **Crazy → barmy**, **very → bloody**, **man → lad**, **ass → arse**, and **that → tha'** have
+  conservative contextual checks to avoid changing their meaning (including preventing `that's` → `tha''s`).
+- **Wanna → want tae**, correcting the old grammatically awkward `fancy tae`.
+
+Context checks examine the *original* words, before translation, so they never
+accidentally treat freshly translated output as new input. Rejected matches do
+not consume a message's substitution allowance. No changes to the original
+Forever chat callback, the Simple 1.0 branch, or how SavedVariables are stored.
+
+These are **heuristics, not full grammar parsing**. Unknown or ambiguous
+constructions are intentionally left unchanged to preserve RP readability.
+The test suite includes positive and negative examples for the context-aware
+vocabulary; game-specific integration remains unverified until Forever launches.

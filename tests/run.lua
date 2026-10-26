@@ -75,7 +75,7 @@ eq(transform("a pretty flower and a pretty view"),
 eq(transform("oh, I don't know"), "och, Ah dinnae ken", "och is optional flavor")
 eq(DA.Transform("Oh, I don't know", db), "Och, Ah dinnae ken", "balanced flavor")
 eq(DA.Transform("friend, worry and bother", db),
-    "friend, fash and bother", "ambiguous vocabulary restricted to Heavy")
+    "friend, worry and bother", "avoid standalone non-idiomatic fash")
 eq(transform("hello, PRETTY flower!"), "hello, BONNIE flower!", "uppercase phrase casing")
 local allAfter, total = DA.Transform("I don't know. I don't know. I don't know.", { preset = "Subtle" })
 eq(allAfter, "Ah dinnae ken. Ah dinnae ken. I don't know.", "unchanged suffix once limit reached")
@@ -102,4 +102,65 @@ for _, rule in ipairs(DA.Rules) do
     assert(type(rule.category) == "string" and #rule.category > 0)
     assert(type(rule.length) == "number" and rule.length == #rule.source)
 end
-print("PASS: additional 1.2 regressions (" .. count .. " total translation assertions)")
+-- Advanced 1.3: contextual vocabulary behavior and conservative fallbacks.
+-- The source word must remain available if surrounding words do not justify a translation.
+eq(transform("a pretty little village"), "a bonnie wee village", "visual adjective before modifier")
+eq(transform("a pretty little problem"), "a pretty wee problem", "not a visual description")
+eq(transform("a pretty small old house"), "a bonnie small old house", "two safe modifiers")
+eq(transform("pretty good, pretty sure, pretty tired"),
+    "pretty good, pretty sure, pretty knackered", "degree adverbs remain intact")
+eq(transform("a beautiful view"), "a bonnie view", "visual beauty")
+eq(transform("a beautiful solution"), "a beautiful solution", "figurative beauty conservatively skipped")
+eq(transform("a beautiful little garden"), "a bonnie wee garden", "beautiful visual noun")
+eq(transform("very good, very much, very cold"),
+    "bloody good, very much, bloody cold", "selective intensifier")
+eq(transform("very, very good"), "very, bloody good", "punctuation does not join context")
+eq(transform("a crazy plan"), "a barmy plan", "crazy noun")
+eq(transform("that's crazy!"), "that's barmy!", "crazy stand-alone description")
+eq(transform("crazy good, crazy about you"),
+    "crazy good, crazy aboot ye", "crazy as degree or idiom is not changed")
+eq(transform("please don't worry"), "please dinnae fash", "idiom prioritized")
+eq(transform("worry yourself, don't trouble me"),
+    "fash yersel, dinnae fash me", "fash takes personal object")
+eq(transform("I worry about trouble"), "Ah worry aboot trouble", "no noun or intransitive fash")
+eq(transform("sorry to bother you"), "sorry to fash ye", "transitive bother becomes fash")
+eq(transform("don't bother to come"), "dinnae bother to come", "bother to is not transitive")
+eq(transform("man the cannons!"), "man the cannons!", "man verb protected")
+eq(transform("man your station, my man"), "man yer station, my lad", "verb vs noun man")
+eq(transform("that's a pretty flower"), "that's a bonnie flower",
+    "that contraction must not become double apostrophe")
+eq(transform("that’s a pretty flower"), "that’s a bonnie flower",
+    "curly apostrophe contraction protected")
+eq(transform("that man"), "tha' lad", "bare demonstrative still converts")
+
+eq(transform("No! No, thanks. No time. No idea."),
+    "Naw! Naw, cheers. Nae time. Nae idea.", "naw reply versus nae determiner")
+eq(transform("no one, no longer, no lantern"),
+    "no one, no longer, no lantern", "ambiguous no stays unchanged")
+eq(transform("I've got no gold"), "Ah've got nae gold", "no as determiner")
+eq(transform("my ass and a stubborn ass"),
+    "my arse and a stubborn ass", "arse body context only")
+eq(transform("what a smart ass!"), "what a smart arse!", "smart arse idiom")
+eq(DA.Transform("I wanna go", { preset = "Balanced" }),
+    "Ah want tae go", "wanna has grammatical replacement")
+eq(DA.Transform("I have no idea", { preset = "Balanced" }),
+    "Ah have no idea", "heavy-only no context not enabled by Balanced")
+local phrasing, used = DA.Transform("pretty sure, you", { preset = "Heavy", maxChanges = 1 })
+eq(phrasing, "pretty sure, ye", "rejected context never consumes substitution budget")
+eq(used, 1, "only successful replacement counts")
+eq(transform("((No idea, pretty lass)) no time"),
+    "((No idea, pretty lass)) nae time", "OOC takes priority over context")
+local validContext = {
+    appearance = true, intensifier = true, crazy_description = true,
+    fash_verb = true, man_noun = true, body_part = true, no_form = true, bare_only = true,
+}
+local contextCount = 0
+for _, rule in ipairs(DA.Rules) do
+    if rule.context then
+        assert(validContext[rule.context], "unknown rule context: " .. rule.context)
+        contextCount = contextCount + 1
+    end
+end
+assert(contextCount >= 10, "not enough context-tagged ambiguous entries")
+print("PASS: Advanced 1.3 translation suite (" .. count .. " assertions; "
+    .. contextCount .. " context-aware rules)")
