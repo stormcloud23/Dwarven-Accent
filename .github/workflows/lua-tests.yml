@@ -19,5 +19,11 @@ jobs:
         run: lua5.1 tests/wow_mock.lua
       - name: Missing API compatibility mocks
         run: lua5.1 tests/compat.lua
+      - name: Check generated Pages data matches Lua vocabulary
+        run: python3 tools/build_review_data.py --check
+      - name: Browser JavaScript syntax checks
+        run: node --check docs/engine.js && node --check docs/app.js
+      - name: Browser vs. Lua parity (all dialogue and edge cases)
+        run: node tests/review_web.test.js
       - name: Informational performance benchmark
         run: lua5.1 tests/benchmark.lua

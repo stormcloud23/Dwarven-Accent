@@ -113,3 +113,29 @@ These are **heuristics, not full grammar parsing**. Unknown or ambiguous
 constructions are intentionally left unchanged to preserve RP readability.
 The test suite includes positive and negative examples for the context-aware
 vocabulary; game-specific integration remains unverified until Forever launches.
+
+## Browser translation review tool (GitHub Pages)
+
+The Advanced branch includes a **browser-based review workshop** in [`docs/`](docs/index.html). It runs the Advanced 1.3 vocabulary, context checks, and preset limits on **270 realistic Warcraft RP phrases**, with full Subtle/Balanced/Heavy comparisons, search/filtering, highlighted replacements, flagging/approval, issue notes, and a custom-phrase tester. Browser reviews and custom examples are stored locally; use **Export review** to save a JSON file and **Import** to restore it elsewhere.
+
+### Publish on GitHub Pages
+
+1. Open **[Settings → Pages](https://github.com/stormcloud23/Dwarven-Accent/settings/pages)** on this repository.
+2. Under **Build and deployment**, select **Deploy from a branch**.
+3. Set the publishing branch to **`advanced`**, folder to **`/docs`**, then click **Save**.
+4. When GitHub reports the build is published, visit **`https://stormcloud23.github.io/Dwarven-Accent/`**. (The URL works after Pages has been enabled and deployment completes.)
+
+There is **no npm build, server, API key, or external hosting dependency**. Updates to `advanced/docs` automatically redeploy after Pages is enabled. These browser files are *not loaded by WoW* and do not alter the Simple branch. The review app uses a JavaScript port of the actual Lua engine; [CI checks](tests/review_web.test.js) ensure the two produce identical outputs across the full dialogue corpus and several extra edge cases.
+
+To add dialogue examples, edit [`tools/phrases.tsv`](tools/phrases.tsv), one category/tab/phrase per line. After changing `Vocabulary.lua`, the context tables in `Core.lua`, or the phrase corpus, regenerate the browser data:
+
+```bash
+python3 tools/build_review_data.py
+node --check docs/engine.js
+node --check docs/app.js
+LUA_BIN=lua5.1 node tests/review_web.test.js
+```
+
+The test suite and GitHub Actions also check `python3 tools/build_review_data.py --check` so that edits cannot quietly leave the published vocabulary out of sync.
+
+**Privacy note:** The site does not transmit your text or saved review notes. Browser-local storage can be cleared; exported files are your own responsibility to share or keep private. The in-game chat hook and addon files remain unchanged by this review tool.
