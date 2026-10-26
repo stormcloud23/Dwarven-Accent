@@ -78,22 +78,19 @@ local function MakeWindow()
             Refresh()
         end)
     end
-    Label(window, "Maximum substitutions per message", 24, -143)
+    Label(window, "Optional substitution limit", 24, -143)
     Button(window, "-", 25, 24, -164, function()
         DA.DB.maxChanges = math.max(0, DA.DB.maxChanges - 1)
         Refresh()
     end)
-    countLabel = Label(window, "Auto", 59, -170, "GameFontHighlight")
+    countLabel = Label(window, "Unlimited", 59, -170, "GameFontHighlight")
     Button(window, "+", 25, 150, -164, function()
         local value = DA.DB.maxChanges
-        local defaultLimit = DA.Presets[DA.DB.preset].limit
-        -- Heavy Auto is unlimited. When selecting a manual cap from Auto,
-        -- begin at the maximum supported manual cap (20), then adjust downward.
-        DA.DB.maxChanges = math.min(20,
-            value == 0 and (defaultLimit == 0 and 20 or defaultLimit + 1) or value + 1)
+        -- Start at a useful optional cap, rather than forcing twenty clicks.
+        DA.DB.maxChanges = math.min(20, value == 0 and 10 or value + 1)
         Refresh()
     end)
-    Button(window, "Auto", 49, 184, -164, function()
+    Button(window, "No limit", 74, 184, -164, function()
         DA.DB.maxChanges = 0
         Refresh()
     end)
@@ -188,10 +185,7 @@ Refresh = function(previewOnly)
     for preset, button in pairs(presetButtons) do
         button:SetEnabled(db.preset ~= preset)
     end
-    local limit = DA.Presets[db.preset].limit
-    countLabel:SetText(db.maxChanges == 0
-        and (limit == 0 and "Auto (Unlimited)" or ("Auto (" .. limit .. ")"))
-        or tostring(db.maxChanges))
+    countLabel:SetText(db.maxChanges == 0 and "Unlimited" or tostring(db.maxChanges))
     for _, category in ipairs(DA.Categories) do
         categoryControls[category.id]:SetChecked(db.categories[category.id] ~= false)
     end

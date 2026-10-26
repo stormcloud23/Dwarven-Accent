@@ -4,9 +4,9 @@ local _, DA = ...
 
 local DEFAULT_PRESET = "Balanced"
 local PRESETS = {
-    Subtle   = { tier = 1, limit = 2 },
-    Balanced = { tier = 2, limit = 3 },
-    Heavy    = { tier = 3, limit = 0 }, -- 0 = unlimited when no manual limit is set
+    Subtle   = { tier = 1, limit = 0 },
+    Balanced = { tier = 2, limit = 0 },
+    Heavy    = { tier = 3, limit = 0 }, -- 0 = unlimited; an optional manual cap overrides it
 }
 DA.Presets = PRESETS
 

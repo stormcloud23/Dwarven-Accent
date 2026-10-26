@@ -50,7 +50,7 @@ eq(transform("/say you are my friend"), "/say you are my friend", "slash command
 eq(DA.Transform("I don't know, my friend. You're right.", db), "Ah dinnae ken, my friend. Ye're right.", "balanced leaves friend unchanged")
 eq(DA.Transform("I don't know, friend!", { preset = "Subtle" }), "Ah dinnae ken, friend!", "subtle")
 eq(DA.Transform("I don't know. I don't know. I don't know.", { preset = "Subtle" }),
-    "Ah dinnae ken. Ah dinnae ken. I don't know.", "message budget")
+    "Ah dinnae ken. Ah dinnae ken. Ah dinnae ken.", "subtle now uncapped")
 eq(transform("yes, little friend", { disabledRules = { ["little"] = true } }), "aye, little freend", "individual toggle")
 eq(transform("yes, little friend", { categories = { slang = false } }), "yes, little friend", "category toggle")
 eq(transform("yes, little friend", { enabled = false }), "yes, little friend", "disabled")
@@ -78,8 +78,8 @@ eq(DA.Transform("friend, worry and bother", db),
     "friend, worry and bother", "avoid standalone non-idiomatic fash")
 eq(transform("hello, PRETTY flower!"), "hello, BONNIE flower!", "uppercase phrase casing")
 local allAfter, total = DA.Transform("I don't know. I don't know. I don't know.", { preset = "Subtle" })
-eq(allAfter, "Ah dinnae ken. Ah dinnae ken. I don't know.", "unchanged suffix once limit reached")
-eq(total, 2, "change count returned to UI")
+eq(allAfter, "Ah dinnae ken. Ah dinnae ken. Ah dinnae ken.", "all sentences translated by default")
+eq(total, 3, "uncapped change count returned to UI")
 local noChanges, zero = DA.Transform("www.example.org/pretty?who=you", db)
 eq(noChanges, "www.example.org/pretty?who=you", "URLs preserved")
 eq(zero, 0, "protected-only text count")
@@ -162,7 +162,7 @@ for _, rule in ipairs(DA.Rules) do
     end
 end
 assert(contextCount >= 10, "not enough context-tagged ambiguous entries")
--- New preset expectations: Heavy defaults to unlimited, both friend variants Heavy-only.
+-- All tiers default to unlimited; the vocabulary tiers still restrict rule eligibility.
 eq(DA.Transform("my friend and friend", {preset="Balanced"}),
     "my friend and friend", "balanced friend expressions untouched")
 eq(DA.Transform("my friend and friend", {preset="Subtle"}),
@@ -178,9 +178,25 @@ eq(manualResult, string.rep("freend ", 4) .. string.rep("friend ", 8),
     "manual heavy substitution cap still works")
 eq(manualCount, 4, "heavy manual limit counts four changes")
 local balancedResult, balancedCount = DA.Transform(string.rep("little ", 12), {preset="Balanced"})
-eq(balancedCount, 3, "balanced retains three-change default limit")
-eq(balancedResult, string.rep("wee ", 3) .. string.rep("little ", 9),
-    "balanced unchanged suffix after cap")
-assert(DA.Presets.Heavy.limit == 0, "zero preset limit represents unlimited")
+eq(balancedCount, 12, "balanced now processes the entire message")
+eq(balancedResult, string.rep("wee ", 12),
+    "balanced preserves no untranslated tail")
+for _, name in ipairs({"Subtle", "Balanced", "Heavy"}) do
+    local presetResult, presetCount = DA.Transform(repeatedFriends, {preset=name})
+    if name == "Heavy" then
+        eq(presetResult, string.rep("freend ", 12), "heavy-only friend translation")
+        eq(presetCount, 12, "heavy friend substitution count")
+    else
+        eq(presetResult, repeatedFriends, name .. " still excludes heavy-only words")
+        eq(presetCount, 0, name .. " still excludes heavy-only words from count")
+    end
+    local longResult, longCount = DA.Transform(string.rep("little ", 12), {preset=name})
+    eq(longResult, string.rep("wee ", 12), name .. " rewrites the full message")
+    eq(longCount, 12, name .. " has no default cap")
+    local cappedResult, cappedCount = DA.Transform(string.rep("little ", 12), {preset=name, maxChanges=4})
+    eq(cappedResult, string.rep("wee ", 4) .. string.rep("little ", 8), name .. " respects manual cap")
+    eq(cappedCount, 4, name .. " reports capped substitution count")
+    assert(DA.Presets[name].limit == 0, name .. " preset must default to unlimited")
+end
 print("PASS: Advanced 1.3 translation suite (" .. count .. " assertions; "
     .. contextCount .. " context-aware rules)")

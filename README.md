@@ -26,14 +26,14 @@ You can safely switch editions by replacing the files in the `DwarvenAccent` dir
 | `/da` | Display status and help |
 | `/da on` / `/da off` | Enable/disable substitutions (saved) |
 | `/da config` | Open the settings window |
-| `/da subtle` | Subtle preset: max 2 substitutions/message, tier 1 |
-| `/da balanced` | Balanced default: max 3 substitutions/message, tiers 1–2 |
-| `/da heavy` | Heavy: unlimited substitutions by default, tiers 1–3 |
+| `/da subtle` | Tier 1 vocabulary only; unlimited substitutions by default |
+| `/da balanced` | Tiers 1–2; unlimited substitutions by default |
+| `/da heavy` | Tiers 1–3; unlimited substitutions by default |
 | `/da test <message>` | Preview without sending |
 
 ## Settings window
 
-- Preset buttons and optional **manual substitution limit** (1–20 or Auto).
+- Preset buttons and an optional **manual substitution limit** (1–20). All presets default to **Unlimited**; use `+` to enable a cap (starting at 10), `+`/`-` to adjust, or **No limit** to disable it.
 - Enable/disable entire categories: phrases, contractions, pronouns, Scots words, everyday words, exclamations, strong language.
 - **Per-rule toggles** and a search box; rules now display their tier `[1]`, `[2]`, or `[3]`.
 - A **paged list with 11 reusable rows**, avoiding 100+ checkboxes created at once.
@@ -47,7 +47,7 @@ Settings are stored account-wide in the game's `DwarvenAccentDB` SavedVariables.
 
 - Matches whole words case-insensitively and applies longer phrases before shorter competing rules.
 - Makes each substitution **once**, without cascading edits of output words.
-- Applies deterministic presets: Subtle has a 2-change cap, Balanced has a 3-change cap, and Heavy is unlimited by default. An optional manual limit of 1–20 overrides any preset.
+- Applies deterministic vocabulary presets with **no automatic substitution cap at any intensity**. Subtle, Balanced and Heavy all process the complete message; an optional manual limit of 1–20 is available in `/da config`.
 - Preserves `((OOC text))` (including unfinished OOC blocks), `[bracketed text]`, full item/spell links, texture/atlas markup, `http(s)`/`www` URLs, and outgoing slash commands.
 - Preserves single-letter `I` capitalization: `I` becomes `Ah`, not `AH`.
 - Avoids awkward `pretty fast` / `pretty sure` → `bonnie fast` / `bonnie sure`. `pretty` remains a Heavy-only rule and now recognizes an optional descriptive modifier before a visual noun.
@@ -120,21 +120,21 @@ The Advanced branch includes a **browser-based review workshop** in [`docs/`](do
 
 ### Long-message testing (Practice Hall)
 
-The in-game addon limits each whole message to **2 Subtle or 3 Balanced** replacements.
-**Heavy is unlimited by default.** A manually chosen 1–20 substitution cap still
-overrides any preset. Long passages in Subtle/Balanced may therefore stop translating
-after their first few eligible words unless Full Passage mode is selected.
+**All three in-game presets are unlimited by default.** Vocabulary tiers, not
+message-length cutoffs, determine which substitutions are allowed. An optional
+**1–20 substitutions per message** limit can still be enabled through `/da config`.
+The cap is disabled by default, and any enabled manual limit is saved between sessions.
 
-The Practice Hall now offers two clearly labeled modes:
+The Practice Hall offers two modes:
 
-- **Full passage (default):** browser-only uncapped translation that continues
-  applying eligible replacements throughout the entire text, ideal for spotting
-  grammar and vocabulary issues in longer samples.
-- **In-game limits:** Subtle stops after 2, Balanced after 3, Heavy is unlimited by default; all match WoW.
+- **Default — unlimited:** matches the normal in-game behavior for Subtle, Balanced,
+  and Heavy, and tests every eligible word in a passage.
+- **Test a manual cap:** choose any limit from 1–20 to preview how the optional
+  in-game setting would behave. This is a preview-only control.
 
-Both modes share the same vocabulary, context checks, and markup protections.
-The browser-only option does **not** change the real addon or the phrase-library
-review outputs. The Subtle/Balanced caps and optional manual cap remain in WoW.
+Both modes use the same vocabulary, context checks, and markup protections.
+The review library uses the uncapped preset defaults, and the Simple 1.0 branch
+remains unchanged.
 
 ### Publish on GitHub Pages
 

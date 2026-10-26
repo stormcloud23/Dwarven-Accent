@@ -50,7 +50,7 @@ assert.equal(engine.transform("I don't know",{preset:'Balanced'}).text,'Ah dinna
 assert.equal(engine.transform('that’s a pretty flower',{preset:'Heavy'}).text,'that’s a bonnie flower');
 // Browser-only full-passage review mode must not change default in-game parity.
 const repeated = ("I don't know. ").repeat(32).trim();
-for (const [name,cap] of [['Subtle',2],['Balanced',3],['Heavy',32]]) {
+for (const [name,cap] of [['Subtle',32],['Balanced',32],['Heavy',32]]) {
     const game=engine.transform(repeated,{preset:name});
     const full=engine.transform(repeated,{preset:name,reviewUnlimited:true});
     assert.equal(game.count,cap,`${name} in-game default substitution count`);
@@ -68,8 +68,12 @@ const withMarkup = ("I don't know. ").repeat(8) + '((I don\'t know.)) [you] ' + 
 const fullMarkup=engine.transform(withMarkup,{preset:'Balanced',reviewUnlimited:true});
 assert.equal(fullMarkup.count,16,'OOC and bracketed text remain protected in full review');
 assert.ok(fullMarkup.text.includes('((I don\'t know.)) [you]'));
-assert.equal(engine.transform(repeated,{preset:'Balanced',reviewUnlimited:false}).count,3,
-  'Explicit non-full mode remains capped');
+assert.equal(engine.transform(repeated,{preset:'Balanced',reviewUnlimited:false}).count,32,
+  'Without a manual cap, ordinary browser mode also translates the full text');
+for (const name of ['Subtle','Balanced','Heavy']) {
+  assert.equal(engine.transform(repeated,{preset:name,maxChanges:10}).count,10,
+    name+' optional custom cap limits changes');
+}
 assert.equal(engine.transform(repeated,{preset:'Balanced',maxChanges:1,reviewUnlimited:true}).count,32,
   'Full review mode bypasses custom cap as well');
 console.log('PASS: browser-only full-passage mode, in-game caps, markup, and final-sentence coverage');

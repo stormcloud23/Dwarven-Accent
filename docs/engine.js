@@ -1,6 +1,6 @@
 /* Browser port of the exact Advanced 1.3 Lua translation rules.
    Coverage is enforced by comparing ALL fixtures with the real Lua Core.lua in CI.
-   Protected spans, preset limits, original-text context, and single-pass precedence
+   Protected spans, optional caps, original-text context, and single-pass precedence
    intentionally mirror Core.lua. Never edit data.js by hand. */
 (function (root) {
   'use strict';
@@ -121,10 +121,9 @@
     if (typeof text !== 'string' || !text || text.startsWith('/')) return {text, count:0, parts:[{text:text||''}]};
     const settings=settingsFrom(options), preset=D.presets[settings.preset];
     if (!settings.enabled) return {text,count:0,parts:[{text}]};
-    // Browser-only review override. Never changes the WoW Lua engine or normal
-    // preview behavior; by default the same 2/3/7 message cap still applies.
-    // Generated preset.limit === 0 means unlimited (Heavy default only).
-    // A manually set maxChanges always overrides the preset default.
+    // All three presets have an unlimited default (limit === 0).
+    // An explicit maxChanges 1–20 enables an optional per-message cap.
+    // reviewUnlimited is a browser-only override for side-by-side review.
     const limit=options.reviewUnlimited === true || (settings.maxChanges===0 && preset.limit===0)
       ? Number.POSITIVE_INFINITY : (settings.maxChanges>0 ? settings.maxChanges : preset.limit);
     const parts=[];

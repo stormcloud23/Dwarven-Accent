@@ -108,12 +108,13 @@
   }
   function customPreview(){const src=$('custom-input').value;
     $('custom-length').textContent=src.length+' / 2500 characters';$('save-custom').disabled=!src.trim();
-    const full=document.querySelector('input[name="custom-mode"]:checked')?.value!=='game';
-    const extra=full?{reviewUnlimited:true}:{};
-    const description=full
-      ? 'Reviewing every eligible phrase throughout the passage. In-game, Subtle stops at 2 and Balanced at 3; Heavy is uncapped by default.'
-      : 'Exact in-game simulation: Subtle stops after 2 changes, Balanced after 3; Heavy is unlimited by default.';
-    $('custom-mode-note').textContent=description;
+    const capped=document.querySelector('input[name="custom-mode"]:checked')?.value==='game';
+    const cap=Math.min(20,Math.max(1,Number($('custom-cap').value)||10));
+    $('custom-cap-wrap').hidden=!capped;
+    const extra=capped?{maxChanges:cap}:{};
+    $('custom-mode-note').textContent=capped
+      ? 'Previewing an optional '+cap+'-change cap per message, as if enabled in the in-game config.'
+      : 'All three presets translate eligible words throughout the passage. Vocabulary tiers control intensity.';
     const holder=$('custom-results');holder.replaceChildren(...PRESETS.map(p=>translationCard(src,p,true,extra)));
   }
   function download(name,text,type){const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);
@@ -146,6 +147,7 @@
     $('custom-input').addEventListener('input',customPreview);
     for(const radio of document.querySelectorAll('input[name="custom-mode"]'))
       radio.addEventListener('change',customPreview);
+    $('custom-cap').addEventListener('input',customPreview);
     for(const btn of document.querySelectorAll('[data-sample]'))btn.addEventListener('click',()=>{$('custom-input').value=btn.dataset.sample;customPreview();$('custom-input').focus();});
     $('save-custom').addEventListener('click',()=>{
       const text=$('custom-input').value.trim();if(!text)return;
