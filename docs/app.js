@@ -31,12 +31,12 @@
     control.append(new Option('My phrases','custom'));
   }
   function settings(preset){return {preset};}
-  function makeOutput(src,preset){return E.transform(src,settings(preset));}
+  function makeOutput(src,preset,extra={}){return E.transform(src,{...settings(preset),...extra});}
   function renderedOutput(output){const n=el('div','output');
     for(const part of output.parts){if(part.changed){const b=el('mark','highlight',part.text);b.title='From: '+part.source;n.append(b);}else n.append(document.createTextNode(part.text||''));}
     return n;
   }
-  function translationCard(source,preset,live=false){const result=makeOutput(source,preset);
+  function translationCard(source,preset,live=false,extra={}){const result=makeOutput(source,preset,extra);
     const card=el('div',live?'translation':'translation');
     const heading=el('div','translation-head');heading.append(el('strong','',preset),el('small','',result.count+' '+(result.count===1?'change':'changes')));
     card.append(heading,renderedOutput(result));return card;
@@ -108,7 +108,13 @@
   }
   function customPreview(){const src=$('custom-input').value;
     $('custom-length').textContent=src.length+' / 2500 characters';$('save-custom').disabled=!src.trim();
-    const holder=$('custom-results');holder.replaceChildren(...PRESETS.map(p=>translationCard(src,p,true)));
+    const full=document.querySelector('input[name="custom-mode"]:checked')?.value!=='game';
+    const extra=full?{reviewUnlimited:true}:{};
+    const description=full
+      ? 'Reviewing every eligible phrase throughout the passage. The real addon still stops after 2 / 3 / 7 changes per message.'
+      : 'Exact in-game simulation: Subtle stops after 2 changes, Balanced after 3, and Heavy after 7 per message.';
+    $('custom-mode-note').textContent=description;
+    const holder=$('custom-results');holder.replaceChildren(...PRESETS.map(p=>translationCard(src,p,true,extra)));
   }
   function download(name,text,type){const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);
     const a=el('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -138,6 +144,8 @@
     $('tab-library').addEventListener('click',()=>switchView('library'));
     $('tab-playground').addEventListener('click',()=>switchView('playground'));
     $('custom-input').addEventListener('input',customPreview);
+    for(const radio of document.querySelectorAll('input[name="custom-mode"]'))
+      radio.addEventListener('change',customPreview);
     for(const btn of document.querySelectorAll('[data-sample]'))btn.addEventListener('click',()=>{$('custom-input').value=btn.dataset.sample;customPreview();$('custom-input').focus();});
     $('save-custom').addEventListener('click',()=>{
       const text=$('custom-input').value.trim();if(!text)return;

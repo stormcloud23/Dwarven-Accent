@@ -48,4 +48,23 @@ for(const line of lua.stdout.trim().split(/\r?\n/)){
 assert.equal(total,all.length*4,'Must compare every corpus and edge phrase against four settings');
 assert.equal(engine.transform("I don't know",{preset:'Balanced'}).text,'Ah dinnae ken');
 assert.equal(engine.transform('that’s a pretty flower',{preset:'Heavy'}).text,'that’s a bonnie flower');
+// Browser-only full-passage review mode must not change default in-game parity.
+const repeated = ("I don't know. ").repeat(32).trim();
+for (const [name,cap] of [['Subtle',2],['Balanced',3],['Heavy',7]]) {
+    const game=engine.transform(repeated,{preset:name});
+    const full=engine.transform(repeated,{preset:name,reviewUnlimited:true});
+    assert.equal(game.count,cap,`${name} in-game per-message cap`);
+    assert.equal(full.count,32,`${name} full passage reaches the last sentence`);
+    assert.ok(full.text.endsWith('Ah dinnae ken.'),`${name} last sentence is translated`);
+    assert.equal(full.parts.map(p=>p.text).join(''),full.text,'Full mode highlights are exact');
+}
+const withMarkup = ("I don't know. ").repeat(8) + '((I don\'t know.)) [you] ' + ("I don't know. ").repeat(8);
+const fullMarkup=engine.transform(withMarkup,{preset:'Balanced',reviewUnlimited:true});
+assert.equal(fullMarkup.count,16,'OOC and bracketed text remain protected in full review');
+assert.ok(fullMarkup.text.includes('((I don\'t know.)) [you]'));
+assert.equal(engine.transform(repeated,{preset:'Balanced',reviewUnlimited:false}).count,3,
+  'Explicit non-full mode remains capped');
+assert.equal(engine.transform(repeated,{preset:'Balanced',maxChanges:1,reviewUnlimited:true}).count,32,
+  'Full review mode bypasses custom cap as well');
+console.log('PASS: browser-only full-passage mode, in-game caps, markup, and final-sentence coverage');
 console.log(`PASS: ${total} browser/Lua parity comparisons (${fromTsv.length} RP dialogues, ${edges.length} edge cases, 4 settings each)`);

@@ -60,12 +60,19 @@
       </section>
 
       <section id="playground-view" class="playground" hidden>
-        <div class="playground-top"><div class="kicker">The practice hall</div><h3>Try a line of your own.</h3><p>Type anything you'd actually say in-game. The previews update instantly, using the same vocabulary, context rules, and substitution limits as Advanced 1.3.</p></div>
+        <div class="playground-top"><div class="kicker">The practice hall</div><h3>Try a line of your own.</h3><p>Type anything you'd actually say in-game. Compare natural RP dialogue using the same vocabulary and context rules as Advanced 1.3. For long passages, you can remove the game's per-message substitution cap.</p></div>
         <label for="custom-input">Your original dialogue</label>
         <textarea id="custom-input" rows="4" maxlength="2500" spellcheck="true" placeholder="I don't know about you, but I'm pretty sure we've got no gold left."></textarea>
         <div class="playground-actions"><span id="custom-length">0 / 2500 characters</span><button id="save-custom" class="gold-button" type="button">+ Save to review library</button></div>
         <div class="sample-chips"><span>Try an example:</span><button data-sample="I'm pretty sure we have no gold left." type="button">Pretty sure</button><button data-sample="Man the cannons! Don't trouble yourself." type="button">Context traps</button><button data-sample="Thank you, my friend. ((OOC: be back soon))" type="button">RP + OOC</button></div>
+        <fieldset class="preview-modes">
+          <legend>How should this passage be translated?</legend>
+          <label class="preview-mode-choice"><input type="radio" name="custom-mode" value="full" checked><span><strong>Full passage</strong><small>Apply eligible replacements throughout the text (best for spotting awkward phrasing).</small></span></label>
+          <label class="preview-mode-choice"><input type="radio" name="custom-mode" value="game"><span><strong>In-game limits</strong><small>Match the actual addon: 2 / 3 / 7 substitutions per message.</small></span></label>
+        </fieldset>
+        <p id="custom-mode-note" class="preview-mode-note" role="status" aria-live="polite"></p>
         <div id="custom-results" class="custom-results"></div>
+        <p class="preview-mode-footnote">This switch affects only the custom tester. The review library and WoW addon continue to show real in-game limits.</p>
         <div class="callout"><strong>Nothing gets sent to a server.</strong> Phrases and notes are saved locally in this browser unless you explicitly export a review file.</div>
       </section>
     </main>

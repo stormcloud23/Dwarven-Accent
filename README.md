@@ -118,6 +118,23 @@ vocabulary; game-specific integration remains unverified until Forever launches.
 
 The Advanced branch includes a **browser-based review workshop** in [`docs/`](docs/index.html). It runs the Advanced 1.3 vocabulary, context checks, and preset limits on **270 realistic Warcraft RP phrases**, with full Subtle/Balanced/Heavy comparisons, search/filtering, highlighted replacements, flagging/approval, issue notes, and a custom-phrase tester. Browser reviews and custom examples are stored locally; use **Export review** to save a JSON file and **Import** to restore it elsewhere.
 
+### Long-message testing (Practice Hall)
+
+The in-game addon intentionally limits each whole message to **2 Subtle, 3 Balanced,
+7 Heavy** replacements, regardless of length. Previously this made the 2,500-character
+Practice Hall text box appear to stop translating after the first sentence.
+
+The Practice Hall now offers two clearly labeled modes:
+
+- **Full passage (default):** browser-only uncapped translation that continues
+  applying eligible replacements throughout the entire text, ideal for spotting
+  grammar and vocabulary issues in longer samples.
+- **In-game limits:** the original exact 2 / 3 / 7 cap per message, matching WoW.
+
+Both modes share the same vocabulary, context checks, and markup protections.
+The browser-only option does **not** change the real addon or the phrase-library
+review outputs. The per-message limits remain in place in WoW.
+
 ### Publish on GitHub Pages
 
 1. Open **[Settings → Pages](https://github.com/stormcloud23/Dwarven-Accent/settings/pages)** on this repository.
