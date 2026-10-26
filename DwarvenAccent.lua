@@ -1,4 +1,4 @@
--- Dwarven Accent Advanced 1.1: outgoing-chat hook and slash commands.
+-- Dwarven Accent Advanced 1.2: outgoing-chat hook and slash commands.
 local ADDON_NAME, DA = ...
 
 local function Print(message)
@@ -69,7 +69,7 @@ frame:SetScript("OnEvent", function(_, event, loadedAddon)
             EventRegistry:RegisterCallback("ChatFrame.OnEditBoxPreSendText", OnPreSendText)
         end)
         if ok then
-            Print("Advanced 1.1 loaded. Type /da config for settings.")
+            Print("Advanced 1.2 loaded. Type /da config for settings.")
         else
             Print("loaded, but couldn't register the chat pre-send hook on this build.")
         end

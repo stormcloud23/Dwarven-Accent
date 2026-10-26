@@ -66,3 +66,40 @@ for _, rule in ipairs(DA.Rules) do
     assert(rule.tier >= 1 and rule.tier <= 3)
 end
 print("PASS: " .. count .. " functional assertions, " .. #DA.Rules .. " unique vocabulary rules")
+
+-- Advanced 1.2 regression cases: conservative phrasing and safe chat markup.
+eq(transform("pretty fast, pretty sure, pretty far"),
+    "pretty fast, pretty sure, pretty far", "pretty is usually an adverb")
+eq(transform("a pretty flower and a pretty view"),
+    "a bonnie flower and a bonnie view", "pretty adjective requires safe noun")
+eq(transform("oh, I don't know"), "och, Ah dinnae ken", "och is optional flavor")
+eq(DA.Transform("Oh, I don't know", db), "Och, Ah dinnae ken", "balanced flavor")
+eq(DA.Transform("friend, worry and bother", db),
+    "friend, fash and bother", "ambiguous vocabulary restricted to Heavy")
+eq(transform("hello, PRETTY flower!"), "hello, BONNIE flower!", "uppercase phrase casing")
+local allAfter, total = DA.Transform("I don't know. I don't know. I don't know.", { preset = "Subtle" })
+eq(allAfter, "Ah dinnae ken. Ah dinnae ken. I don't know.", "unchanged suffix once limit reached")
+eq(total, 2, "change count returned to UI")
+local noChanges, zero = DA.Transform("www.example.org/pretty?who=you", db)
+eq(noChanges, "www.example.org/pretty?who=you", "URLs preserved")
+eq(zero, 0, "protected-only text count")
+local markup = "|cffa335ee|Hitem:123:0|h[Pretty You]|h|r"
+eq(transform("you " .. markup .. " little"), "ye " .. markup .. " wee", "colored link unchanged")
+eq(transform("you |TInterface\\Icons\\INV_Misc_QuestionMark:0|t little"),
+    "ye |TInterface\\Icons\\INV_Misc_QuestionMark:0|t wee", "texture escape")
+eq(transform("you |A:Ping:0:0|a little"), "ye |A:Ping:0:0|a wee", "atlas escape")
+eq(transform("((some OOC [you])) little"), "((some OOC [you])) wee", "mixed protected spans")
+eq(transform("[unclosed you little"), "[unclosed you little", "unfinished bracket safe")
+eq(transform("you || little"), "ye || wee", "escaped pipe sequence safe")
+eq(transform("hello there", { maxChanges = 0 }), "hello there", "no unnecessary changes")
+eq(DA.ValidateSettings({ maxChanges = 100, preset = "Oops" }).maxChanges, 0, "bad max limit")
+eq(DA.ValidateSettings({ disabledRules = "bad", categories = "bad" }).categories ~= nil,
+    true, "invalid saved table repaired")
+
+-- Required rule metadata and stable uniqueness.
+for _, rule in ipairs(DA.Rules) do
+    assert(type(rule.replacement) == "string" and #rule.replacement > 0)
+    assert(type(rule.category) == "string" and #rule.category > 0)
+    assert(type(rule.length) == "number" and rule.length == #rule.source)
+end
+print("PASS: additional 1.2 regressions (" .. count .. " total translation assertions)")

@@ -1,4 +1,4 @@
-name: Lua translation tests
+name: Advanced Lua tests
 on:
   push:
     branches: [advanced]
@@ -6,9 +6,18 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Install Lua 5.1
         run: sudo apt-get update -qq && sudo apt-get install -y lua5.1
-      - name: Run translation tests
+      - name: Lua 5.1 syntax check
+        run: luac5.1 -p Vocabulary.lua Core.lua Options.lua DwarvenAccent.lua tests/*.lua
+      - name: Translation regression tests
         run: lua5.1 tests/run.lua
+      - name: WoW UI and chat callback mocks
+        run: lua5.1 tests/wow_mock.lua
+      - name: Missing API compatibility mocks
+        run: lua5.1 tests/compat.lua
+      - name: Informational performance benchmark
+        run: lua5.1 tests/benchmark.lua

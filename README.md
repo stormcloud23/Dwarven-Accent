@@ -1,54 +1,87 @@
-# Dwarven Accent — Advanced 1.1
+# Dwarven Accent — Advanced 1.2 (pre-release)
 
-A configurable, RP-friendly Scots-inspired outgoing chat rewriter for **World of Warcraft: Forever**. Designed to add a little dwarven character to everyday speech without turning every sentence into an exaggerated accent.
+A configurable, lightweight, RP-friendly Scots-inspired outgoing chat addon for **World of Warcraft: Forever**. Accent comes from predictable vocabulary choices, **not** random catchphrases or intrusive message rewriting.
 
-## Downloads
+## Pick your edition
 
-- **Advanced 1.1 (this branch):** [ZIP](https://github.com/stormcloud23/Dwarven-Accent/archive/refs/heads/advanced.zip)
-- **Simple 1.0 (unchanged `main` branch):** [ZIP](https://github.com/stormcloud23/Dwarven-Accent/archive/refs/heads/main.zip)
+- **[Advanced 1.2 ZIP](https://github.com/stormcloud23/Dwarven-Accent/archive/refs/heads/advanced.zip)** — this branch, features below.
+- **[Simple 1.0 ZIP](https://github.com/stormcloud23/Dwarven-Accent/archive/refs/heads/main.zip)** — the original working beta-tested version. It remains untouched.
 
-Both editions use the same addon identity. **Install only one at a time.**
+Both editions share one addon name, one `/da` command, and one installation directory. **Only install one edition at a time.**
 
 ## Installation
 
-1. Close WoW: Forever and extract the ZIP of your chosen edition.
-2. Rename the extracted folder to **`DwarvenAccent`**.
-3. Copy that folder into your client installation's `Interface\AddOns\` directory (for example, `World of Warcraft\_classic_beta_\Interface\AddOns\`).
-4. Check that `DwarvenAccent.toc`, `DwarvenAccent.lua`, `Vocabulary.lua`, `Core.lua` and `Options.lua` are **directly inside** the `DwarvenAccent` folder.
-5. Start the game and type **`/da config`** to open the settings window. The addon also provides a shortcut in the modern WoW AddOns settings list when supported.
+1. Close Warcraft Forever and download the ZIP for the edition you want.
+2. Extract the ZIP. Rename the extracted directory (`Dwarven-Accent-advanced` or `Dwarven-Accent-main`) to **`DwarvenAccent`**.
+3. Copy that directory to your WoW installation's `Interface\\AddOns\\` folder, e.g. `World of Warcraft\\_classic_beta_\\Interface\\AddOns\\` in the old beta client. The release client may use a different directory.
+4. Ensure `DwarvenAccent.toc` is **directly** inside that directory, alongside the `.lua` files (not inside another nested directory).
+5. Launch the game. Enable the addon if needed, then type `/da config` to see the options window.
+
+You can safely switch editions by replacing the files in the `DwarvenAccent` directory while WoW is closed. Advanced settings may remain in `DwarvenAccentDB`; the Simple version does not use them.
 
 ## Commands
 
-| Command | Effect |
+| Command | Purpose |
 | --- | --- |
-| `/da` | Show status and commands |
-| `/da on` / `/da off` | Turn accent rewriting on or off (saved) |
-| `/da config` | Open the in-game settings window |
-| `/da subtle`, `/da balanced`, `/da heavy` | Select an accent intensity preset |
-| `/da test <message>` | Preview what a message would become without sending it |
+| `/da` | Display status and help |
+| `/da on` / `/da off` | Enable/disable substitutions (saved) |
+| `/da config` | Open the settings window |
+| `/da subtle` | Subtle preset: max 2 substitutions/message, tier 1 |
+| `/da balanced` | Balanced default: max 3 substitutions/message, tiers 1–2 |
+| `/da heavy` | Heavy: max 7 substitutions/message, tiers 1–3 |
+| `/da test <message>` | Preview without sending |
 
-## In-game options
+## Settings window
 
-- **Accent strength:** Subtle (up to 2 substitutions), Balanced (up to 3, the default), Heavy (up to 7).
-- **Custom limit:** Set a fixed substitution cap per message, or use Auto to follow the preset.
-- **Categories:** Enable/disable Phrases & greetings, Contractions, Pronouns, Scots vocabulary, Everyday words, Exclamations, and Strong language.
-- **Individual words:** Search vocabulary and turn any translation on or off without editing Lua.
-- **Preview:** Type into the preview field to see the effect before chatting.
-- **Reset:** Restore the default configuration.
+- Preset buttons and optional **manual substitution limit** (1–20 or Auto).
+- Enable/disable entire categories: phrases, contractions, pronouns, Scots words, everyday words, exclamations, strong language.
+- **Per-rule toggles** and a search box; rules now display their tier `[1]`, `[2]`, or `[3]`.
+- A **paged list with 11 reusable rows**, avoiding 100+ checkboxes created at once.
+- Muted row text indicates a rule excluded by the current preset or category; the checkbox still controls whether that individual rule is enabled.
+- Live preview shows the number of actual substitutions.
+- Reset all settings to defaults.
 
-Settings are kept in the account-wide `DwarvenAccentDB` SavedVariables table. Preset limits are intentionally conservative, and the default Balanced preset excludes the most aggressive substitutions. The original word list is retained, with duplicate entries removed and some substitutions moved to Heavy.
+Settings are stored account-wide in the game's `DwarvenAccentDB` SavedVariables. There are no external addon dependencies.
 
-## RP protections
+## Translation behavior
 
-- Each eligible phrase is processed **once**. Replacements cannot cascade into further replacements.
-- Whole-word matching and capitalization handling (including standalone `I`).
-- Leave `((out-of-character text))` unchanged, including an unfinished OOC block.
-- Preserve `[bracketed sections]`, full WoW item/spell hyperlinks, and common URLs.
-- Leave messages beginning with `/` untouched. The addon does **not** modify incoming chat, and does not automatically insert random catchphrases.
-- Context safeguard: `pretty sure`/`pretty good` and similar degree expressions do not become `bonnie sure`/`bonnie good`.
+- Matches whole words case-insensitively and applies longer phrases before shorter competing rules.
+- Makes each substitution **once**, without cascading edits of output words.
+- Applies a deterministic preset and message substitution cap — no random variability across identical inputs.
+- Preserves `((OOC text))` (including unfinished OOC blocks), `[bracketed text]`, full item/spell links, texture/atlas markup, `http(s)`/`www` URLs, and outgoing slash commands.
+- Preserves single-letter `I` capitalization: `I` becomes `Ah`, not `AH`.
+- Avoids awkward `pretty fast` / `pretty sure` → `bonnie fast` / `bonnie sure`. `pretty` is now a Heavy-only rule used only before a small curated set of visibly descriptive nouns.
+- Reclassifies `friend`, `trouble`, `bother`, and the `very` → `bloody` rule as Heavy only; `oh` translates to `och` at Balanced/Heavy.
+- Never changes incoming chat or generates new phrases on its own.
 
-## Developer notes
+## Offline development and tests
 
-`Vocabulary.lua` holds rules and categories, `Core.lua` handles deterministic transformation and settings, `Options.lua` provides the UI, and `DwarvenAccent.lua` handles WoW event integration. Run `lua5.1 tests/run.lua` from the repo root to execute the included test suite. A GitHub Actions workflow also runs tests on pushes to the `advanced` branch.
+Requires Lua 5.1 for the target compatibility suite (other Lua runtimes may work):
 
-**Compatibility:** Kept the original Forever `## Interface: 16001` and `ChatFrame.OnEditBoxPreSendText` callback. Client variants may differ; if the callback is not available, the addon reports that chat rewriting did not register. The in-game settings window has not yet been validated inside a live Forever client.
+```sh
+luac5.1 -p Vocabulary.lua Core.lua Options.lua DwarvenAccent.lua tests/*.lua
+lua5.1 tests/run.lua
+lua5.1 tests/wow_mock.lua
+lua5.1 tests/compat.lua
+lua5.1 tests/benchmark.lua
+```
+
+- `tests/run.lua`: regression cases for word boundaries, presets, case handling, OOC sections, item links, hyperlinks, URLs, markup, and substitution limits.
+- `tests/wow_mock.lua`: emulates key WoW frames, settings registration, the working chat callback, UI filtering and rule toggles.
+- `tests/compat.lua`: confirms a missing optional settings API or EventRegistry produces graceful behavior rather than a load failure.
+- `tests/benchmark.lua`: informational throughput check, never a CI performance gate (desktop Lua timings are not in-game timings).
+- The GitHub Actions workflow runs syntax checks, functional tests, mocks, and the benchmark on pushes to `advanced`.
+
+## Compatibility caveat — release test needed November 4, 2026
+
+**Simple 1.0 worked in the Forever beta.** For Advanced we deliberately retain the **same `## Interface: 16001` identifier** and the tested `EventRegistry:RegisterCallback("ChatFrame.OnEditBoxPreSendText", ...)` hook. We have **not** substituted another unverified chat interception method.
+
+Current retail WoW supports `Settings.RegisterCanvasLayoutCategory` / `Settings.RegisterAddOnCategory`, but a future Forever client build may implement a different subset. The standalone `/da config` window works even when the optional Settings integration is absent. A client missing the chat callback will report that rewriting is unavailable; the addon does **not** intercept chat through a riskier fallback.
+
+These mock tests cannot prove that the release client will accept the `.toc` interface version, its widget templates, or its live chat callback. On launch, test `/da config`, `/da test`, `/say`, a linked item, `((OOC))`, and a logout/login persistence cycle. Keep Simple 1.0 ready as a fallback.
+
+### Maintainers
+
+`Vocabulary.lua` holds categories and tiers, `Core.lua` owns matching and SavedVariables handling, `Options.lua` implements the UI, and `DwarvenAccent.lua` is the integration point. Do not merge the advanced branch into `main` unless explicitly requested.
+
+Useful API references: [WoW Settings panels](https://warcraft.wiki.gg/wiki/Creating_a_settings_menu), [WoW hyperlink structure](https://warcraft.wiki.gg/wiki/Hyperlinks).

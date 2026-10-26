@@ -1,4 +1,4 @@
--- Dwarven Accent Advanced 1.1: curated vocabulary, from the original 1.0 rules.
+-- Dwarven Accent Advanced 1.2: curated vocabulary, from the original 1.0 rules.
 -- Tier 1 = Subtle; tier 2 = Balanced; tier 3 = Heavy only.
 -- Every source string is a stable identifier for the individual rule toggle.
 local _, DA = ...
@@ -107,11 +107,11 @@ Add("slang", 2, "before", "afore")
 Add("slang", 2, "crazy", "barmy")
 Add("slang", 2, "tired", "knackered")
 Add("slang", 2, "worry", "fash")
-Add("slang", 2, "trouble", "fash")
-Add("slang", 2, "bother", "fash")
-Add("slang", 2, "pretty", "bonnie")
+Add("slang", 3, "trouble", "fash")
+Add("slang", 3, "bother", "fash")
+Add("slang", 3, "pretty", "bonnie")
 Add("slang", 2, "beautiful", "bonnie")
-Add("slang", 2, "friend", "freend")
+Add("slang", 3, "friend", "freend")
 Add("slang", 3, "nothing", "naething")
 Add("slang", 3, "man", "lad")
 Add("slang", 3, "boy", "laddy")
@@ -130,10 +130,10 @@ Add("everyday", 3, "about", "aboot")
 Add("everyday", 3, "because", "cause")
 Add("everyday", 3, "though", "tho")
 Add("everyday", 3, "of", "o'")
-Add("everyday", 3, "very", "bloody")
+Add("strong", 3, "very", "bloody")
 Add("everyday", 3, "no", "naw")
 
-Add("exclamations", 2, "oh", "ah")
+Add("exclamations", 2, "oh", "och")
 Add("strong", 3, "shit", "shite")
 Add("strong", 3, "ass", "arse")
 
