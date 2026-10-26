@@ -123,8 +123,10 @@
     if (!settings.enabled) return {text,count:0,parts:[{text}]};
     // Browser-only review override. Never changes the WoW Lua engine or normal
     // preview behavior; by default the same 2/3/7 message cap still applies.
-    const limit=options.reviewUnlimited === true ? Number.POSITIVE_INFINITY
-      : (settings.maxChanges>0 ? settings.maxChanges : preset.limit);
+    // Generated preset.limit === 0 means unlimited (Heavy default only).
+    // A manually set maxChanges always overrides the preset default.
+    const limit=options.reviewUnlimited === true || (settings.maxChanges===0 && preset.limit===0)
+      ? Number.POSITIVE_INFINITY : (settings.maxChanges>0 ? settings.maxChanges : preset.limit);
     const parts=[];
     let changes=0,cursor=0,position=0;
     const plain = (s)=>{const res=transformPlain(s,settings,preset,limit-changes);parts.push(...res.parts);changes+=res.count;};

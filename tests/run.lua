@@ -47,7 +47,7 @@ eq(transform("|Hspell:1|h[You Know]|h friend"), "|Hspell:1|h[You Know]|h freend"
 eq(transform("/say you are my friend"), "/say you are my friend", "slash commands")
 
 -- Presets, limits and per-rule/category opt-outs.
-eq(DA.Transform("I don't know, my friend. You're right.", db), "Ah dinnae ken, ma freend. Ye're right.", "balanced only enables eligible tiers")
+eq(DA.Transform("I don't know, my friend. You're right.", db), "Ah dinnae ken, my friend. Ye're right.", "balanced leaves friend unchanged")
 eq(DA.Transform("I don't know, friend!", { preset = "Subtle" }), "Ah dinnae ken, friend!", "subtle")
 eq(DA.Transform("I don't know. I don't know. I don't know.", { preset = "Subtle" }),
     "Ah dinnae ken. Ah dinnae ken. I don't know.", "message budget")
@@ -162,5 +162,25 @@ for _, rule in ipairs(DA.Rules) do
     end
 end
 assert(contextCount >= 10, "not enough context-tagged ambiguous entries")
+-- New preset expectations: Heavy defaults to unlimited, both friend variants Heavy-only.
+eq(DA.Transform("my friend and friend", {preset="Balanced"}),
+    "my friend and friend", "balanced friend expressions untouched")
+eq(DA.Transform("my friend and friend", {preset="Subtle"}),
+    "my friend and friend", "subtle friend expressions untouched")
+eq(DA.Transform("my friend and friend", {preset="Heavy"}),
+    "ma freend and freend", "heavy friend expressions enabled")
+local repeatedFriends = string.rep("friend ", 12)
+local heavyResult, heavyCount = DA.Transform(repeatedFriends, {preset="Heavy"})
+eq(heavyResult, string.rep("freend ", 12), "heavy continues past seven changes")
+eq(heavyCount, 12, "heavy counts all changes without a cap")
+local manualResult, manualCount = DA.Transform(repeatedFriends, {preset="Heavy", maxChanges=4})
+eq(manualResult, string.rep("freend ", 4) .. string.rep("friend ", 8),
+    "manual heavy substitution cap still works")
+eq(manualCount, 4, "heavy manual limit counts four changes")
+local balancedResult, balancedCount = DA.Transform(string.rep("little ", 12), {preset="Balanced"})
+eq(balancedCount, 3, "balanced retains three-change default limit")
+eq(balancedResult, string.rep("wee ", 3) .. string.rep("little ", 9),
+    "balanced unchanged suffix after cap")
+assert(DA.Presets.Heavy.limit == 0, "zero preset limit represents unlimited")
 print("PASS: Advanced 1.3 translation suite (" .. count .. " assertions; "
     .. contextCount .. " context-aware rules)")

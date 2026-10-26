@@ -36,7 +36,7 @@ Add("phrases", 1, "thanks", "cheers")
 Add("phrases", 2, "how are you", "how are ye")
 Add("phrases", 2, "what are you", "whit are ye")
 Add("phrases", 2, "come here", "come o'er here")
-Add("phrases", 2, "my friend", "ma freend")
+Add("phrases", 3, "my friend", "ma freend")
 Add("phrases", 3, "this sucks", "tha's a fine mess")
 Add("phrases", 3, "out of", "oot o'")
 

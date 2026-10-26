@@ -28,7 +28,7 @@ You can safely switch editions by replacing the files in the `DwarvenAccent` dir
 | `/da config` | Open the settings window |
 | `/da subtle` | Subtle preset: max 2 substitutions/message, tier 1 |
 | `/da balanced` | Balanced default: max 3 substitutions/message, tiers 1–2 |
-| `/da heavy` | Heavy: max 7 substitutions/message, tiers 1–3 |
+| `/da heavy` | Heavy: unlimited substitutions by default, tiers 1–3 |
 | `/da test <message>` | Preview without sending |
 
 ## Settings window
@@ -47,11 +47,11 @@ Settings are stored account-wide in the game's `DwarvenAccentDB` SavedVariables.
 
 - Matches whole words case-insensitively and applies longer phrases before shorter competing rules.
 - Makes each substitution **once**, without cascading edits of output words.
-- Applies a deterministic preset and message substitution cap — no random variability across identical inputs.
+- Applies deterministic presets: Subtle has a 2-change cap, Balanced has a 3-change cap, and Heavy is unlimited by default. An optional manual limit of 1–20 overrides any preset.
 - Preserves `((OOC text))` (including unfinished OOC blocks), `[bracketed text]`, full item/spell links, texture/atlas markup, `http(s)`/`www` URLs, and outgoing slash commands.
 - Preserves single-letter `I` capitalization: `I` becomes `Ah`, not `AH`.
 - Avoids awkward `pretty fast` / `pretty sure` → `bonnie fast` / `bonnie sure`. `pretty` remains a Heavy-only rule and now recognizes an optional descriptive modifier before a visual noun.
-- Reclassifies `friend`, `trouble`, `bother`, and the `very` → `bloody` rule as Heavy only; `oh` translates to `och` at Balanced/Heavy.
+- Restricts both `friend → freend` and `my friend → ma freend` to Heavy only, alongside `trouble`, `bother`, and `very → bloody`; `oh` translates to `och` at Balanced/Heavy.
 - Never changes incoming chat or generates new phrases on its own.
 
 ## Offline development and tests
@@ -120,20 +120,21 @@ The Advanced branch includes a **browser-based review workshop** in [`docs/`](do
 
 ### Long-message testing (Practice Hall)
 
-The in-game addon intentionally limits each whole message to **2 Subtle, 3 Balanced,
-7 Heavy** replacements, regardless of length. Previously this made the 2,500-character
-Practice Hall text box appear to stop translating after the first sentence.
+The in-game addon limits each whole message to **2 Subtle or 3 Balanced** replacements.
+**Heavy is unlimited by default.** A manually chosen 1–20 substitution cap still
+overrides any preset. Long passages in Subtle/Balanced may therefore stop translating
+after their first few eligible words unless Full Passage mode is selected.
 
 The Practice Hall now offers two clearly labeled modes:
 
 - **Full passage (default):** browser-only uncapped translation that continues
   applying eligible replacements throughout the entire text, ideal for spotting
   grammar and vocabulary issues in longer samples.
-- **In-game limits:** the original exact 2 / 3 / 7 cap per message, matching WoW.
+- **In-game limits:** Subtle stops after 2, Balanced after 3, Heavy is unlimited by default; all match WoW.
 
 Both modes share the same vocabulary, context checks, and markup protections.
 The browser-only option does **not** change the real addon or the phrase-library
-review outputs. The per-message limits remain in place in WoW.
+review outputs. The Subtle/Balanced caps and optional manual cap remain in WoW.
 
 ### Publish on GitHub Pages
 

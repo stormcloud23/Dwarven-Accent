@@ -111,8 +111,8 @@
     const full=document.querySelector('input[name="custom-mode"]:checked')?.value!=='game';
     const extra=full?{reviewUnlimited:true}:{};
     const description=full
-      ? 'Reviewing every eligible phrase throughout the passage. The real addon still stops after 2 / 3 / 7 changes per message.'
-      : 'Exact in-game simulation: Subtle stops after 2 changes, Balanced after 3, and Heavy after 7 per message.';
+      ? 'Reviewing every eligible phrase throughout the passage. In-game, Subtle stops at 2 and Balanced at 3; Heavy is uncapped by default.'
+      : 'Exact in-game simulation: Subtle stops after 2 changes, Balanced after 3; Heavy is unlimited by default.';
     $('custom-mode-note').textContent=description;
     const holder=$('custom-results');holder.replaceChildren(...PRESETS.map(p=>translationCard(src,p,true,extra)));
   }

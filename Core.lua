@@ -6,7 +6,7 @@ local DEFAULT_PRESET = "Balanced"
 local PRESETS = {
     Subtle   = { tier = 1, limit = 2 },
     Balanced = { tier = 2, limit = 3 },
-    Heavy    = { tier = 3, limit = 7 },
+    Heavy    = { tier = 3, limit = 0 }, -- 0 = unlimited when no manual limit is set
 }
 DA.Presets = PRESETS
 
@@ -262,7 +262,8 @@ function DA.Transform(text, settings)
     local db = ValidateSettings(settings or DA.DB or NewSettings())
     if not db.enabled then return text, 0 end
     local preset = PRESETS[db.preset]
-    local limit = db.maxChanges > 0 and db.maxChanges or preset.limit
+    local limit = db.maxChanges > 0 and db.maxChanges
+        or (preset.limit == 0 and math.huge or preset.limit)
     local out, changed, cursor, pos = {}, 0, 1, 1
     while pos <= #text do
         local length = ProtectedLength(text, pos)

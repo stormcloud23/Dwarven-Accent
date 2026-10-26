@@ -86,7 +86,11 @@ local function MakeWindow()
     countLabel = Label(window, "Auto", 59, -170, "GameFontHighlight")
     Button(window, "+", 25, 150, -164, function()
         local value = DA.DB.maxChanges
-        DA.DB.maxChanges = math.min(20, value == 0 and DA.Presets[DA.DB.preset].limit + 1 or value + 1)
+        local defaultLimit = DA.Presets[DA.DB.preset].limit
+        -- Heavy Auto is unlimited. When selecting a manual cap from Auto,
+        -- begin at the maximum supported manual cap (20), then adjust downward.
+        DA.DB.maxChanges = math.min(20,
+            value == 0 and (defaultLimit == 0 and 20 or defaultLimit + 1) or value + 1)
         Refresh()
     end)
     Button(window, "Auto", 49, 184, -164, function()
@@ -185,7 +189,9 @@ Refresh = function(previewOnly)
         button:SetEnabled(db.preset ~= preset)
     end
     local limit = DA.Presets[db.preset].limit
-    countLabel:SetText(db.maxChanges == 0 and ("Auto (" .. limit .. ")") or tostring(db.maxChanges))
+    countLabel:SetText(db.maxChanges == 0
+        and (limit == 0 and "Auto (Unlimited)" or ("Auto (" .. limit .. ")"))
+        or tostring(db.maxChanges))
     for _, category in ipairs(DA.Categories) do
         categoryControls[category.id]:SetChecked(db.categories[category.id] ~= false)
     end

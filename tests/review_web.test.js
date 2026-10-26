@@ -50,14 +50,20 @@ assert.equal(engine.transform("I don't know",{preset:'Balanced'}).text,'Ah dinna
 assert.equal(engine.transform('that’s a pretty flower',{preset:'Heavy'}).text,'that’s a bonnie flower');
 // Browser-only full-passage review mode must not change default in-game parity.
 const repeated = ("I don't know. ").repeat(32).trim();
-for (const [name,cap] of [['Subtle',2],['Balanced',3],['Heavy',7]]) {
+for (const [name,cap] of [['Subtle',2],['Balanced',3],['Heavy',32]]) {
     const game=engine.transform(repeated,{preset:name});
     const full=engine.transform(repeated,{preset:name,reviewUnlimited:true});
-    assert.equal(game.count,cap,`${name} in-game per-message cap`);
+    assert.equal(game.count,cap,`${name} in-game default substitution count`);
     assert.equal(full.count,32,`${name} full passage reaches the last sentence`);
     assert.ok(full.text.endsWith('Ah dinnae ken.'),`${name} last sentence is translated`);
     assert.equal(full.parts.map(p=>p.text).join(''),full.text,'Full mode highlights are exact');
 }
+assert.equal(engine.transform('my friend and friend',{preset:'Balanced'}).text,
+  'my friend and friend','Balanced never translates friend or my friend to freend');
+assert.equal(engine.transform('my friend and friend',{preset:'Heavy'}).text,
+  'ma freend and freend','Heavy translates both friend expressions');
+assert.equal(engine.transform(repeated,{preset:'Heavy',maxChanges:4}).count,4,
+  'Manual Heavy cap still takes precedence over unlimited default');
 const withMarkup = ("I don't know. ").repeat(8) + '((I don\'t know.)) [you] ' + ("I don't know. ").repeat(8);
 const fullMarkup=engine.transform(withMarkup,{preset:'Balanced',reviewUnlimited:true});
 assert.equal(fullMarkup.count,16,'OOC and bracketed text remain protected in full review');
