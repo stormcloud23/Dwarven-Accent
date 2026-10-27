@@ -154,7 +154,13 @@ local function ContextReplacement(rule, lower, first, last)
     local context = rule.context
     if not context then return rule.replacement end
     local nextWord = NextWord(lower, last)
-    if context == "appearance" then
+    if context == "imperial_no_reply" then
+        -- Nein is a standalone answer, not the determiner in "no gold".
+        local before = lower:sub(1, first - 1)
+        local after = lower:sub(last + 1)
+        return (not nextWord or NO_REPLY_FOLLOWERS[nextWord]
+            or after:match("^%s*[,!?.]")) and rule.replacement or nil
+    elseif context == "appearance" then
         return HasVisualNoun(lower, last) and rule.replacement or nil
     elseif context == "intensifier" then
         return nextWord and EMPHASIS_ADJECTIVES[nextWord] and rule.replacement or nil
