@@ -70,8 +70,6 @@ Add("phrases",2,"come here","come here, schnell")
 Add("phrases",2,"don't worry","keep your nerve")
 Add("phrases",2,"do not worry","keep your nerve")
 Add("phrases",2,"dont worry","keep your nerve")
-Add("phrases",2,"my lord","mein lord")
-Add("phrases",2,"my lady","mein lady")
 
 -- Tier 2: pronouns
 Add("pronouns",2,"captain","Hauptmann")
@@ -101,7 +99,7 @@ Add("exclamations",2,"oh","ach")
 Add("exclamations",2,"damn it","verdammt")
 
 -- Tier 2: strong
-Add("strong",2,"damned","verdamned")
+Add("strong",2,"damned","accursed")
 
 -- Tier 3: phrases
 Add("phrases",3,"i don't know","I've not the faintest notion")
