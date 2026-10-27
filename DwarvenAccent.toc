@@ -1,8 +1,8 @@
 ## Interface: 16001
-## Title: Dwarven Accent |cffd4a760Advanced|r
-## Notes: Configurable, RP-friendly Scots-inspired voice for outgoing chat.
+## Title: Imperial Accent |cffd4a760Advanced Engine|r
+## Notes: Configurable, RP-friendly Reikland-inspired Imperial voice for outgoing chat.
 ## Author: Stormcloud23
-## Version: 1.3.0
+## Version: 0.1.0
 ## SavedVariables: DwarvenAccentDB
 
 Vocabulary.lua
