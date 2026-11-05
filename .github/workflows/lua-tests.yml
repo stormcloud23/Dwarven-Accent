@@ -2,6 +2,8 @@ name: Advanced Lua tests
 on:
   push:
     branches: [advanced]
+  pull_request:
+    branches: [advanced]
   workflow_dispatch:
 jobs:
   test:

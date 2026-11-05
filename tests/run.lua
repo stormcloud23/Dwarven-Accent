@@ -254,3 +254,19 @@ eq(transform("((bro and dude)) [guy] bro"),
     "((bro and dude)) [guy] lad", "OOC and item references protected")
 print("PASS: Advanced 1.4 translation suite (" .. count .. " assertions; "
     .. contextCount .. " context-aware rules)")
+
+-- Typography and token safety: operate on original spans, never normalize output.
+eq(transform("I don’t know where you’re going."), "Ah dinnae ken where ye're going.", "typography and token safety")
+eq(transform("I   do not know, thank   you!"), "Ah dinnae ken, thank ye!", "typography and token safety")
+eq(transform("You’d know your friend’s name."), "You’d ken yer friend’s name.", "typography and token safety")
+eq(transform("someone's little-known friend"), "someone's wee-known freend", "typography and token safety")
+eq(transform("'you' and 'friend'"), "'ye' and 'freend'", "typography and token safety")
+eq(transform("caféyou youé friendé éfriend"), "caféyou youé friendé éfriend", "typography and token safety")
+eq(transform("HTTPS://example.com/you/friend WWW.example.com/little you"), "HTTPS://example.com/you/friend WWW.example.com/little ye", "typography and token safety")
+eq(transform("((I don’t know)) [you’re] I don’t know"), "((I don’t know)) [you’re] Ah dinnae ken", "typography and token safety")
+local typography, typographyCount = DA.Transform("I   don’t know, you’re here.", {maxChanges=1})
+eq(typography, "Ah dinnae ken, you’re here.", "typography respects cap")
+eq(typographyCount, 1, "typographic phrase counts once")
+print("PASS: " .. count .. " total translation assertions")
+
+eq(transform("I’m ready. I’ve got gold. I’ll help. I’d go."), "Ah'm ready. Ah've got gold. Ah'll help. Ah'd go.", "explicit first-person contractions")

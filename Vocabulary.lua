@@ -92,6 +92,11 @@ Add("pronouns", 2, "yourself", "yersel")
 Add("pronouns", 2, "do you", "d'ye")
 Add("pronouns", 2, "you", "ye")
 Add("pronouns", 2, "your", "yer")
+-- Explicit forms preserve the first-person voice without matching inside words.
+Add("pronouns", 2, "i'm", "ah'm")
+Add("pronouns", 2, "i've", "ah've")
+Add("pronouns", 2, "i'll", "ah'll")
+Add("pronouns", 2, "i'd", "ah'd")
 Add("pronouns", 2, "i", "ah")
 Add("pronouns", 3, "them", "thae")
 

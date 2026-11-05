@@ -2,6 +2,14 @@
 
 A configurable, lightweight, RP-friendly Scots-inspired outgoing chat addon for **World of Warcraft: Forever**. Accent comes from predictable vocabulary choices, **not** random catchphrases or intrusive message rewriting.
 
+## Local improvements
+
+- Straight and curly apostrophes match the same rules: `I don’t know` becomes `Ah dinnae ken`.
+- Phrases tolerate extra spaces without changing untouched text or protected links.
+- Apostrophes and non-ASCII letters no longer allow partial-word substitutions (for example, `friend’s` stays intact).
+- URL protection also handles uppercase `HTTPS://` and `WWW.`.
+- Pull requests targeting advanced now run the existing compatibility and browser parity suite.
+
 ## Pick your edition
 
 - **[Advanced 1.4 ZIP](https://github.com/stormcloud23/Dwarven-Accent/archive/refs/heads/advanced.zip)** — this branch, features below.
