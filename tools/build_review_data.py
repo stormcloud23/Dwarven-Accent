@@ -27,7 +27,7 @@ def generate():
     assert len(rules) >= 100, f'Unexpected vocabulary: {len(rules)} rules'
     assert len({r['source'] for r in rules}) == len(rules), 'Duplicate source'
     categories = [dict(id=m[0], label=m[1]) for m in re.findall(r'\{ id = "([^"]+)", label = "([^"]+)" \}', VOCAB)]
-    assert len(categories) == 7
+    assert len(categories) == 8
     presets = {name: dict(tier=int(tier), limit=int(limit))
                for name, tier, limit in re.findall(r'(Subtle|Balanced|Heavy)\s*=\s*\{ tier = (\d+), limit = (\d+) \}', CORE)}
     assert len(presets) == 3

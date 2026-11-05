@@ -160,14 +160,14 @@ local selected = DA.Rules[1].source
 local ruleCheck
 for _, f in ipairs(all) do
     if f.kind == "CheckButton" and f.scripts.OnClick then
-        -- The first 8 checkboxes are the enabled toggle and categories;
+        -- The enabled toggle and category checkboxes come before the vocabulary;
         -- the first rule checkbox comes after them.
         if f == all[1] then end
     end
 end
 local checkFrames = {}
 for _, f in ipairs(all) do if f.kind == "CheckButton" then checkFrames[#checkFrames + 1] = f end end
-ruleCheck = checkFrames[9]
+ruleCheck = checkFrames[#DA.Categories + 2]
 assert(ruleCheck, "first vocabulary control")
 ruleCheck:SetChecked(false)
 ruleCheck.scripts.OnClick(ruleCheck)

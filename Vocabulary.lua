@@ -10,6 +10,7 @@ DA.Categories = {
     { id = "slang", label = "Scots vocabulary" },
     { id = "everyday", label = "Everyday words" },
     { id = "exclamations", label = "Exclamations" },
+    { id = "dwarven", label = "Dwarven expressions" },
     { id = "strong", label = "Strong language" },
 }
 
@@ -157,5 +158,38 @@ Add("everyday", 3, "no", "naw", "no_form")
 Add("exclamations", 2, "oh", "och")
 Add("strong", 3, "shit", "shite")
 Add("strong", 3, "ass", "arse", "body_part")
+
+-- Warcraft-inspired dwarf idioms. Phrase-only: never rename races, places,
+-- abilities, drinks or crafting materials. Each expression has its own toggle.
+Add("dwarven", 2, "oh my god", "by my beard")
+Add("dwarven", 2, "oh my gosh", "by my beard")
+Add("dwarven", 2, "oh my goodness", "by my beard")
+Add("dwarven", 2, "my goodness", "by the forge")
+Add("dwarven", 2, "good heavens", "great mountains")
+Add("dwarven", 2, "thank god", "thank the ancestors")
+Add("dwarven", 2, "thank goodness", "thank the ancestors")
+Add("dwarven", 2, "for heaven's sake", "for the love o' the forge")
+Add("dwarven", 2, "for goodness sake", "for the love o' the forge")
+Add("dwarven", 2, "for goodness' sake", "for the love o' the forge")
+Add("dwarven", 3, "what the hell", "what in the deep forge")
+Add("dwarven", 3, "what on earth", "what in the mountain")
+Add("dwarven", 3, "holy crap", "great beards")
+Add("dwarven", 3, "holy shit", "great thundering beards")
+Add("dwarven", 3, "good luck", "may yer hammer strike true")
+Add("dwarven", 3, "stay safe", "keep yer feet on the ground")
+Add("dwarven", 3, "be careful", "mind yer footing")
+Add("dwarven", 3, "cheers to that", "ah'll raise a tankard tae that")
+Add("dwarven", 3, "let's get to work", "let's get the forge fired up")
+Add("dwarven", 3, "back to work", "back tae the anvil")
+Add("dwarven", 3, "job well done", "a fine bit o' craftsmanship")
+Add("dwarven", 3, "well done", "well forged")
+Add("dwarven", 3, "that's nonsense", "that's a load o' slag")
+Add("dwarven", 3, "that is nonsense", "that's a load o' slag")
+Add("dwarven", 3, "complete nonsense", "a load o' slag")
+Add("dwarven", 3, "i need a drink", "ah need a tankard o' ale")
+Add("dwarven", 3, "let's have a drink", "let's raise a tankard")
+Add("dwarven", 3, "over my dead body", "over ma cold, stone-dead body")
+Add("dwarven", 3, "you have my word", "ye have ma word as a dwarf")
+Add("dwarven", 3, "i swear", "by ma beard, ah swear")
 
 DA.Rules = entries
