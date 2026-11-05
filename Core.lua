@@ -150,7 +150,7 @@ end
 -- Returns the actual substitution, or nil to leave the original word intact.
 -- This is more flexible than a yes/no check: English 'no' is either the answer
 -- 'naw' or the negative determiner 'nae' in Scots, but often ambiguous.
-local function ContextReplacement(rule, lower, first, last)
+local function ContextReplacement(rule, lower, first, last, original)
     local context = rule.context
     if not context then return rule.replacement end
     local nextWord = NextWord(lower, last)
@@ -182,6 +182,12 @@ local function ContextReplacement(rule, lower, first, last)
             or before:match("pardon%s+me%s*$") ~= nil
         return (addressOpening or addressedAfterComma or addressedAtStart
             or politeAddress) and rule.replacement or nil
+    elseif context == "guy_person" then
+        -- 'Guy' can be a given name; 'guy wire' is rigging, not a person.
+        if original == "Guy" or nextWord == "wire" or nextWord == "wires"
+            or nextWord == "rope" or nextWord == "ropes"
+            or nextWord == "line" or nextWord == "lines" then return nil end
+        return rule.replacement
     elseif context == "man_noun" then
         -- 'Man the cannons!' must never become 'Lad the cannons!'
         return (not nextWord or not MAN_VERB_FOLLOWERS[nextWord])
@@ -218,7 +224,7 @@ local function TransformPlain(text, db, preset, remaining)
                 if last <= #text and lower:sub(pos, last) == rule.source
                     and (last == #text or not IsWordChar(text:sub(last + 1, last + 1)))
                     and RuleAllowed(rule, db, preset) then
-                    local replacement = ContextReplacement(rule, lower, pos, last)
+                    local replacement = ContextReplacement(rule, lower, pos, last, text:sub(pos, last))
                     if replacement then
                         selected, selectedReplacement = rule, replacement
                         break

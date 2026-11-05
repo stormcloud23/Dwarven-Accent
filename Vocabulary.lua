@@ -122,6 +122,17 @@ Add("slang", 3, "girl", "lassy")
 Add("slang", 3, "girls", "lasses")
 -- 'miss' is an honorific / form of address ONLY; not the verb or a failed attack.
 Add("slang", 3, "miss", "lass", "miss_address")
+-- Modern conversational masculine terms; Heavy-only to avoid overpowering RP.
+Add("slang", 3, "bro", "lad")
+Add("slang", 3, "bros", "lads")
+Add("slang", 3, "guy", "lad", "guy_person")
+Add("slang", 3, "guys", "lads")
+Add("slang", 3, "dude", "lad")
+Add("slang", 3, "dudes", "lads")
+Add("slang", 3, "buddy", "lad")
+Add("slang", 3, "buddies", "lads")
+Add("slang", 3, "fella", "lad")
+Add("slang", 3, "fellas", "lads")
 
 Add("everyday", 2, "with", "wi'")
 Add("everyday", 2, "without", "wi'oot")

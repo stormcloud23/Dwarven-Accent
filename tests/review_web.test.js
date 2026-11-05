@@ -28,7 +28,7 @@ assert.ok(generated.phrases.some(p=>p.category==='Protected text' && p.text.incl
 assert.ok(generated.phrases.some(p=>p.text==='Good evening, boys and girls.'),
     'Greetings must contain untranslated boys and girls');
 
-assert.equal(generated.rules.length,110,'Expected complete vocabulary');
+assert.equal(generated.rules.length,120,'Expected complete vocabulary');
 const revised = [
   ['Hello, miss. Do you need a hand?', "Hello, lass. D'ye need a hand?"],
   ['Good evening, boys and girls.', 'Good evening, lads and lasses.'],
@@ -48,6 +48,15 @@ for (const [original, expected] of [
 ]) assert.equal(engine.transform(original,{preset:'Heavy'}).text,expected,
                 'Context-sensitive address rule: '+original);
 
+for (const [original, expected] of [
+  ['bro bros guy guys dude dudes buddy buddies fella fellas', 'lad lads lad lads lad lads lad lads lad lads'],
+  ['A guy wire held the mast.', 'A guy wire held the mast.'],
+  ['Guy Fawkes was here.', 'Guy Fawkes was here.'],
+  ['That guy over there.', "Tha' lad ower there."],
+]) assert.equal(engine.transform(original,{preset:'Heavy'}).text,expected,
+                'New Heavy conversational address rule: '+original);
+assert.equal(engine.transform('bro guys dude',{preset:'Balanced'}).text,
+  'bro guys dude','Conversational address words are Heavy-only');
 const edges = [
     '[[you] friend] yes',
     'You |TInterface\\Icons\\INV_Misc_QuestionMark:0|t are my friend',

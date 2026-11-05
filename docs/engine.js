@@ -27,7 +27,7 @@
     }
     return false;
   }
-  function contextReplacement(rule, lower, first, last) {
+  function contextReplacement(rule, lower, first, last, original) {
     if (!rule.context) return rule.replacement;
     const next = nextWord(lower, last);
     switch (rule.context) {
@@ -47,6 +47,9 @@
         const polite=/(?:excuse|pardon)\s+me\s*$/.test(before);
         return (greeting || afterComma || atStart || polite) ? rule.replacement : null;
       }
+      case 'guy_person':
+        return original === 'Guy' || ['wire','wires','rope','ropes','line','lines'].includes(next)
+          ? null : rule.replacement;
       case 'man_noun': return !next || !sets.MAN_VERB_FOLLOWERS.has(next) ? rule.replacement : null;
       case 'bare_only': return (lower[last] !== "'" && lower[last] !== '’') ? rule.replacement : null;
       case 'body_part': { const prev = previousWord(lower,first); return prev && sets.BODY_PART_PRECEDERS.has(prev) ? rule.replacement : null; }
@@ -110,7 +113,7 @@
           const last=position+rule.length;
           if (lower.slice(position,last)===rule.source && (last===text.length || !isWord(text[last])) &&
               rule.tier<=preset.tier && settings.categories[rule.category]!==false && settings.disabledRules[rule.source]!==true) {
-            const candidate = contextReplacement(rule,lower,position,last);
+            const candidate = contextReplacement(rule,lower,position,last,text.slice(position,last));
             if (candidate!==null) { selected=rule;replacement=candidate;break; }
           }
         }

@@ -49,7 +49,7 @@ def generate():
         phrases.append(dict(id='p'+str(len(phrases)+1).zfill(3), category=category, text=phrase))
     assert len(phrases) >= 200, f'Not enough phrases: {len(phrases)}'
     assert len({p['text'] for p in phrases}) == len(phrases), 'Repeated phrase'
-    payload = dict(version='1.3', sourceHash=source_hash, rules=rules, presets=presets,
+    payload = dict(version='1.4', sourceHash=source_hash, rules=rules, presets=presets,
                    categories=categories, contexts=tables, phrases=phrases)
     return ('/* GENERATED from Core.lua, Vocabulary.lua and tools/phrases.tsv.\n'
             '   Do not edit. Run: python3 tools/build_review_data.py */\n'

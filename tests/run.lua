@@ -153,7 +153,7 @@ eq(transform("((No idea, pretty lass)) no time"),
 local validContext = {
     appearance = true, intensifier = true, crazy_description = true,
     fash_verb = true, man_noun = true, body_part = true, no_form = true, bare_only = true,
-    miss_address = true,
+    miss_address = true, guy_person = true,
 }
 local contextCount = 0
 for _, rule in ipairs(DA.Rules) do
@@ -235,5 +235,22 @@ eq(DA.Transform("Hello, miss!", {preset="Balanced"}),
     "Hello, miss!", "vocative miss is Heavy-only")
 eq(DA.Transform("Good evening, boys and girls.", {preset="Balanced"}),
     "Good evening, boys and girls.", "plural forms are Heavy-only")
-print("PASS: Advanced 1.3 translation suite (" .. count .. " assertions; "
+-- Modern casual address words are intentionally Heavy-only.
+eq(transform("bro bros guy guys dude dudes buddy buddies fella fellas"),
+    "lad lads lad lads lad lads lad lads lad lads", "new casual address vocabulary")
+eq(transform("BRO, GUYS! Dude."),
+    "LAD, LADS! Lad.", "new address terms preserve case")
+eq(transform("broccoli broad videoguy"),
+    "broccoli broad videoguy", "do not transform inside longer words")
+eq(transform("A guy wire held the mast."),
+    "A guy wire held the mast.", "guy wire is not a person")
+eq(transform("Guy Fawkes was here."),
+    "Guy Fawkes was here.", "proper name Guy is preserved")
+eq(transform("That guy over there."),
+    "Tha' lad ower there.", "common noun guy still works")
+eq(DA.Transform("bro, guys and dude", {preset="Balanced"}),
+    "bro, guys and dude", "new address terms require Heavy")
+eq(transform("((bro and dude)) [guy] bro"),
+    "((bro and dude)) [guy] lad", "OOC and item references protected")
+print("PASS: Advanced 1.4 translation suite (" .. count .. " assertions; "
     .. contextCount .. " context-aware rules)")

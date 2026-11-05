@@ -1,10 +1,10 @@
-# Dwarven Accent — Advanced 1.3 (pre-release)
+# Dwarven Accent — Advanced 1.4
 
 A configurable, lightweight, RP-friendly Scots-inspired outgoing chat addon for **World of Warcraft: Forever**. Accent comes from predictable vocabulary choices, **not** random catchphrases or intrusive message rewriting.
 
 ## Pick your edition
 
-- **[Advanced 1.3 ZIP](https://github.com/stormcloud23/Dwarven-Accent/archive/refs/heads/advanced.zip)** — this branch, features below.
+- **[Advanced 1.4 ZIP](https://github.com/stormcloud23/Dwarven-Accent/archive/refs/heads/advanced.zip)** — this branch, features below.
 - **[Simple 1.0 ZIP](https://github.com/stormcloud23/Dwarven-Accent/archive/refs/heads/main.zip)** — the original working beta-tested version. It remains untouched.
 
 Both editions share one addon name, one `/da` command, and one installation directory. **Only install one edition at a time.**
@@ -15,9 +15,15 @@ Both editions share one addon name, one `/da` command, and one installation dire
 2. Extract the ZIP. Rename the extracted directory (`Dwarven-Accent-advanced` or `Dwarven-Accent-main`) to **`DwarvenAccent`**.
 3. Copy that directory to your WoW installation's `Interface\\AddOns\\` folder, e.g. `World of Warcraft\\_classic_beta_\\Interface\\AddOns\\` in the old beta client. The release client may use a different directory.
 4. Ensure `DwarvenAccent.toc` is **directly** inside that directory, alongside the `.lua` files (not inside another nested directory).
-5. Launch the game. Enable the addon if needed, then type `/da config` to see the options window.
+5. Launch the game. Enable the addon if needed, then click the **minimap mining icon** or type `/da config` to see the options window.
 
 You can safely switch editions by replacing the files in the `DwarvenAccent` directory while WoW is closed. Advanced settings may remain in `DwarvenAccentDB`; the Simple version does not use them.
+
+## Minimap shortcut and window controls
+
+- A small **mining icon** appears around the minimap after login. Left-click to open/close the configuration window, or left-drag it around the minimap to save its position.
+- The window's **X** now explicitly closes the configuration frame; the bottom **Close** button and Escape also work.
+- The button does not require LibDBIcon or any external dependency. Position is kept in the same account-wide SavedVariables table. It is skipped gracefully if the client has no minimap frame.
 
 ## Commands
 
@@ -86,7 +92,7 @@ These mock tests cannot prove that the release client will accept the `.toc` int
 
 Useful API references: [WoW Settings panels](https://warcraft.wiki.gg/wiki/Creating_a_settings_menu), [WoW hyperlink structure](https://warcraft.wiki.gg/wiki/Hyperlinks).
 
-## Context-sensitive vocabulary (Advanced 1.3)
+## Context-sensitive vocabulary (Advanced 1.4)
 
 The core uses a **small, deterministic set of grammar hints** for ambiguous
 words; it does not guess with random percentages or depend on external services.
@@ -96,6 +102,11 @@ browser means its translation depends on nearby words.
 - **Pretty/beautiful → bonnie** only for a curated list of visual descriptions,
   optionally after one or two visual modifiers (`pretty little village`), not
   in `pretty sure`, `pretty good`, or `beautiful solution`.
+- **Casual masculine address (Heavy only):** `bro/bros`, `guy/guys`,
+  `dude/dudes`, `buddy/buddies`, and `fella/fellas` become `lad/lads`.
+  The singular `guy` rule avoids rigging phrases like `guy wire` and
+  the capitalized given name `Guy`; word-boundary checks leave `broccoli`
+  and longer words unchanged.
 - **Miss → lass** only as a form of address (e.g., `Hello, miss`), not as
   the verb (`I miss you`), a failed attack (`that was a miss`), or a title before
   someone's surname (`Miss Smith`). **Boys → lads** and **girls → lasses** are

@@ -3,7 +3,7 @@
 local _, DA = ...
 local window, filterBox, previewBox, previewOutput, countLabel, pageLabel, matchLabel
 local categoryControls, ruleRows, presetButtons = {}, {}, {}
-local enabledCheck, previousButton, nextButton
+local enabledCheck, previousButton, nextButton, minimapButton
 local page = 1
 local PAGE_SIZE = 11
 local Refresh
@@ -64,7 +64,21 @@ local function MakeWindow()
     window:SetScript("OnDragStart", function(self) self:StartMoving() end)
     window:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
     window:Hide()
-    if window.TitleText then window.TitleText:SetText("Dwarven Accent - Advanced 1.3") end
+    if window.TitleText then window.TitleText:SetText("Dwarven Accent - Advanced 1.4") end
+    -- Some Forever builds draw the inherited X but do not attach a working
+    -- close handler. Bind the actual template button explicitly; otherwise
+    -- construct one. Raise it above the draggable config window.
+    local close = window.CloseButton
+        or (_G and _G["DwarvenAccentConfigFrameCloseButton"])
+    if not close then
+        close = CreateFrame("Button", "DwarvenAccentCloseButton", window, "UIPanelCloseButton")
+        close:SetPoint("TOPRIGHT", window, "TOPRIGHT", -3, -3)
+    end
+    close:SetScript("OnClick", function() window:Hide() end)
+    close:EnableMouse(true)
+    if close.SetFrameLevel and window.GetFrameLevel then
+        close:SetFrameLevel(window:GetFrameLevel() + 8)
+    end
     if UISpecialFrames then table.insert(UISpecialFrames, "DwarvenAccentConfigFrame") end
 
     enabledCheck = Check(window, 19, -40, "Enable outgoing accent", function(value)
@@ -232,7 +246,89 @@ function DA.ShowConfig()
     window:Raise()
 end
 
+-- Compact, dependency-free minimap shortcut. Left-click toggles settings;
+-- left-drag moves the icon around the minimap and saves its position.
+local function PlaceMinimapButton(angle)
+    if not minimapButton or not Minimap then return end
+    local radians = math.rad(angle)
+    minimapButton:ClearAllPoints()
+    minimapButton:SetPoint("CENTER", Minimap, "CENTER",
+        math.cos(radians) * 80, math.sin(radians) * 80)
+end
+
+function DA.ToggleConfig()
+    if window and window.IsShown and window:IsShown() then
+        window:Hide()
+    else
+        DA.ShowConfig()
+    end
+end
+
+local function MakeMinimapButton()
+    if minimapButton or not Minimap then return end
+    minimapButton = CreateFrame("Button", "DwarvenAccentMinimapButton", Minimap)
+    minimapButton:SetSize(31, 31)
+    minimapButton:SetFrameStrata("MEDIUM")
+    if Minimap.GetFrameLevel and minimapButton.SetFrameLevel then
+        minimapButton:SetFrameLevel(Minimap:GetFrameLevel() + 8)
+    end
+    local icon = minimapButton:CreateTexture(nil, "ARTWORK")
+    icon:SetTexture("Interface\\Icons\\Trade_Mining")
+    icon:SetSize(21, 21)
+    icon:SetPoint("CENTER", minimapButton, "CENTER", 0, 0)
+    local border = minimapButton:CreateTexture(nil, "OVERLAY")
+    border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
+    border:SetSize(53, 53)
+    border:SetPoint("CENTER", minimapButton, "CENTER", 11, -11)
+
+    minimapButton:RegisterForClicks("LeftButtonUp")
+    minimapButton:RegisterForDrag("LeftButton")
+    minimapButton:SetScript("OnClick", function() DA.ToggleConfig() end)
+    minimapButton:SetScript("OnEnter", function(self)
+        if GameTooltip then
+            GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+            GameTooltip:AddLine("Dwarven Accent")
+            GameTooltip:AddLine("Click: settings  |  Drag: move", 1, 1, 1)
+            GameTooltip:Show()
+        end
+    end)
+    minimapButton:SetScript("OnLeave", function()
+        if GameTooltip then GameTooltip:Hide() end
+    end)
+    minimapButton:SetScript("OnDragStart", function(self)
+        if not GetCursorPosition or not Minimap.GetCenter then return end
+        self:SetScript("OnUpdate", function()
+            local mx, my = GetCursorPosition()
+            local scale = Minimap:GetEffectiveScale()
+            if not scale or scale == 0 then return end
+            local cx, cy = Minimap:GetCenter()
+            if not cx or not cy then return end
+            local dx, dy = mx / scale - cx, my / scale - cy
+            local angle
+            if dx == 0 then
+                angle = dy >= 0 and 90 or 270
+            else
+                angle = math.deg(math.atan(dy / dx))
+                if dx < 0 then angle = angle + 180
+                elseif dy < 0 then angle = angle + 360 end
+            end
+            DA.DB.minimapAngle = angle % 360
+            PlaceMinimapButton(DA.DB.minimapAngle)
+        end)
+    end)
+    minimapButton:SetScript("OnDragStop", function(self)
+        self:SetScript("OnUpdate", nil)
+    end)
+
+    local angle = DA.DB and DA.DB.minimapAngle
+    if type(angle) ~= "number" or angle ~= angle
+        or angle < 0 or angle >= 360 then angle = 225 end
+    if DA.DB then DA.DB.minimapAngle = angle end
+    PlaceMinimapButton(angle)
+end
+
 function DA.InitOptions()
+    MakeMinimapButton()
     -- The standalone /da config window works even on clients without Settings.
     if Settings and Settings.RegisterCanvasLayoutCategory then
         local ok = pcall(AddSettingsShortcut)
