@@ -16,9 +16,15 @@ local function widget(kind, name)
     for _, method in ipairs({ "SetSize", "SetPoint", "SetFrameStrata", "SetClampedToScreen",
         "SetMovable", "EnableMouse", "RegisterForDrag", "SetWidth", "SetHeight",
         "SetAutoFocus", "SetMaxLetters", "SetJustifyH", "SetWordWrap", "ClearFocus",
-        "StartMoving", "StopMovingOrSizing" }) do
+        "StartMoving", "StopMovingOrSizing", "SetFrameLevel", "ClearAllPoints",
+        "RegisterForClicks", "SetTexture", "SetTexCoord" }) do
         obj[method] = function() end
     end
+    function obj:CreateTexture() return widget("Texture") end
+    function obj:GetFrameLevel() return 1 end
+    function obj:GetEffectiveScale() return 1 end
+    function obj:GetCenter() return 500, 500 end
+    function obj:IsShown() return self.visible end
     function obj:SetText(value)
         self.text = value
         if self.scripts.OnTextChanged then self.scripts.OnTextChanged(self) end
@@ -35,9 +41,15 @@ local function widget(kind, name)
     function obj:SetScript(name, cb) self.scripts[name] = cb end
     all[#all + 1] = obj
     if name then byName[name] = obj end
+    if name == "DwarvenAccentConfigFrame" then
+        obj.CloseButton = widget("Button", "DwarvenAccentConfigFrameCloseButton")
+    end
     return obj
 end
 CreateFrame = widget
+Minimap = widget("Frame", "Minimap")
+local cursorX, cursorY = 500, 580
+GetCursorPosition = function() return cursorX, cursorY end
 EventRegistry = { RegisterCallback = function(_, key, fn) callbacks[key] = fn end }
 Settings = {
     RegisterCanvasLayoutCategory = function(_, name) return { name = name } end,
@@ -64,6 +76,9 @@ eventFrame.scripts.OnEvent(eventFrame, "ADDON_LOADED", "OtherAddon")
 eq(DA.DB, nil, "ignores other addons")
 eventFrame.scripts.OnEvent(eventFrame, "ADDON_LOADED", "DwarvenAccent")
 eq(DA.DB.preset, "Balanced", "default preset")
+local minimap = byName.DwarvenAccentMinimapButton
+assert(minimap and minimap.scripts.OnClick, "minimap button is created at addon load")
+eq(DA.DB.minimapAngle, 225, "default minimap icon position")
 eq(registered.addonCategory, "Dwarven Accent", "modern settings registration")
 local preSend = callbacks["ChatFrame.OnEditBoxPreSendText"]
 assert(type(preSend) == "function", "pre-send callback registered")
@@ -95,6 +110,23 @@ eq(DA.DB.enabled, true, "slash enabled persisted")
 slash("config")
 local config = byName.DwarvenAccentConfigFrame
 assert(config and config.visible and config.raised, "settings window opens")
+eq(UISpecialFrames[1], "DwarvenAccentConfigFrame", "escape frame")
+local closeX = config.CloseButton
+assert(closeX and closeX.scripts.OnClick, "template X has explicit close handler")
+closeX.scripts.OnClick(closeX)
+eq(config.visible, false, "X closes the configuration window")
+minimap.scripts.OnClick(minimap, "LeftButton")
+eq(config.visible, true, "minimap click opens the configuration window")
+minimap.scripts.OnClick(minimap, "LeftButton")
+eq(config.visible, false, "second minimap click closes the configuration window")
+slash("config")
+eq(config.visible, true, "slash command reopens after minimap toggle")
+minimap.scripts.OnDragStart(minimap)
+assert(minimap.scripts.OnUpdate, "minimap icon starts radial dragging")
+minimap.scripts.OnUpdate(minimap)
+eq(math.floor(DA.DB.minimapAngle + 0.5), 90, "dragged minimap angle follows cursor")
+minimap.scripts.OnDragStop(minimap)
+eq(minimap.scripts.OnUpdate, nil, "drag update handler removed when released")
 eq(UISpecialFrames[1], "DwarvenAccentConfigFrame", "escape frame")
 local checks = 0
 for _, f in ipairs(all) do if f.kind == "CheckButton" then checks = checks + 1 end end
@@ -158,9 +190,9 @@ end
 local pageLabel = labelStarting("Page ")
 assert(pageLabel, "vocabulary page indicator")
 buttonNamed("Next").scripts.OnClick(buttonNamed("Next"))
-eq(pageLabel.text, "Page 2 / 10", "paginated vocabulary")
+eq(pageLabel.text, "Page 2 / 11", "paginated vocabulary")
 buttonNamed("Previous").scripts.OnClick(buttonNamed("Previous"))
-eq(pageLabel.text, "Page 1 / 10", "previous vocabulary page")
+eq(pageLabel.text, "Page 1 / 11", "previous vocabulary page")
 filter:SetText("no-such-word-possibly")
 eq(pageLabel.text, "Page 1 / 1", "empty filter has one safe page")
 filter:SetText("")
