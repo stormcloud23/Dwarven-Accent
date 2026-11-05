@@ -20,7 +20,24 @@ local function widget(kind, name)
         "RegisterForClicks", "SetTexture", "SetTexCoord" }) do
         obj[method] = function() end
     end
-    function obj:CreateTexture() return widget("Texture") end
+    function obj:SetPoint(...) self.point = {...} end
+    function obj:GetWidth() return self.width or 140 end
+    function obj:GetHeight() return self.height or 140 end
+    function obj:HookScript(name, cb)
+        local previous = self.scripts[name]
+        self.scripts[name] = function(...)
+            if previous then previous(...) end
+            cb(...)
+        end
+    end
+    function obj:CreateTexture(_, layer)
+        local texture = widget("Texture")
+        texture.layer = layer
+        self.textures = self.textures or {}
+        self.textures[#self.textures + 1] = texture
+        return texture
+    end
+    function obj:SetSize(width, height) self.width, self.height = width, height end
     function obj:GetFrameLevel() return 1 end
     function obj:GetEffectiveScale() return 1 end
     function obj:GetCenter() return 500, 500 end
@@ -48,6 +65,9 @@ local function widget(kind, name)
 end
 CreateFrame = widget
 Minimap = widget("Frame", "Minimap")
+Minimap.width, Minimap.height = 360, 360
+local resizeCalls = 0
+Minimap:SetScript("OnSizeChanged", function() resizeCalls = resizeCalls + 1 end)
 local cursorX, cursorY = 500, 580
 GetCursorPosition = function() return cursorX, cursorY end
 EventRegistry = { RegisterCallback = function(_, key, fn) callbacks[key] = fn end }
@@ -79,6 +99,32 @@ eq(DA.DB.preset, "Balanced", "default preset")
 local minimap = byName.DwarvenAccentMinimapButton
 assert(minimap and minimap.scripts.OnClick, "minimap button is created at addon load")
 eq(DA.DB.minimapAngle, 225, "default minimap icon position")
+local distance = math.sqrt(minimap.point[4]^2 + minimap.point[5]^2)
+eq(math.floor(distance + 0.5), 185, "button matches LibDBIcon radius on enlarged map")
+eq(minimap.textures[1].width, 17, "classic icon matches LibDBIcon size")
+eq(minimap.textures[1].point[1], "TOPLEFT", "classic icon anchor")
+eq(minimap.textures[1].point[4], 7, "classic icon horizontal inset")
+eq(minimap.textures[1].point[5], -6, "classic icon vertical inset")
+eq(minimap.textures[2].point[1], "TOPLEFT", "border matches LibDBIcon anchor")
+eq(minimap.textures[3].layer, "BACKGROUND", "button has background behind icon")
+Minimap.width, Minimap.height = 240, 180
+Minimap.scripts.OnSizeChanged(Minimap, 240, 180)
+eq(resizeCalls, 1, "existing map resize handler preserved")
+eq(math.floor(math.abs(minimap.point[4]) * math.sqrt(2) + 0.5), 125, "resize updates horizontal orbit")
+eq(math.floor(math.abs(minimap.point[5]) * math.sqrt(2) + 0.5), 95, "resize updates vertical orbit")
+eq(DA.DB.minimapAngle, 225, "resize keeps saved angle")
+local delegatedButton, delegatedAngle
+LibStub = function(name, silent)
+    eq(name, "LibDBIcon-1.0", "looks up optional positioning library")
+    eq(silent, true, "missing library lookup is silent")
+    return {SetButtonToPosition=function(_, button, angle)
+        delegatedButton, delegatedAngle = button, angle
+    end}
+end
+minimap.scripts.OnEvent(minimap, "PLAYER_LOGIN")
+eq(delegatedButton, minimap, "uses installed LibDBIcon for shared radius and shape")
+eq(delegatedAngle, 225, "library positioning keeps saved angle")
+LibStub = nil
 eq(registered.addonCategory, "Dwarven Accent", "modern settings registration")
 local preSend = callbacks["ChatFrame.OnEditBoxPreSendText"]
 assert(type(preSend) == "function", "pre-send callback registered")
@@ -125,6 +171,7 @@ minimap.scripts.OnDragStart(minimap)
 assert(minimap.scripts.OnUpdate, "minimap icon starts radial dragging")
 minimap.scripts.OnUpdate(minimap)
 eq(math.floor(DA.DB.minimapAngle + 0.5), 90, "dragged minimap angle follows cursor")
+eq(math.floor(minimap.point[5] + 0.5), 95, "dragging matches resized LibDBIcon orbit")
 minimap.scripts.OnDragStop(minimap)
 eq(minimap.scripts.OnUpdate, nil, "drag update handler removed when released")
 eq(UISpecialFrames[1], "DwarvenAccentConfigFrame", "escape frame")

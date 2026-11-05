@@ -29,9 +29,9 @@ You can safely switch editions by replacing the files in the `DwarvenAccent` dir
 
 ## Minimap shortcut and window controls
 
-- A small **mining icon** appears around the minimap after login. Left-click to open/close the configuration window, or left-drag it around the minimap to save its position.
+- A small **mining icon** follows the same rim placement and texture anchors as LibDBIcon buttons. Its orbit follows the actual map dimensions, including enlarged maps and live resizing. Left-click to open/close the configuration window, or left-drag it around the minimap to save its position.
 - The window's **X** now explicitly closes the configuration frame; the bottom **Close** button and Escape also work.
-- The button does not require LibDBIcon or any external dependency. Position is kept in the same account-wide SavedVariables table. It is skipped gracefully if the client has no minimap frame.
+- The button uses LibDBIcon positioning when that library is already loaded (including its custom radius/map shape), with a matching default circular orbit when absent. No external dependency is required. Position is kept in the same account-wide SavedVariables table. It is skipped gracefully if the client has no minimap frame.
 
 ## Commands
 
