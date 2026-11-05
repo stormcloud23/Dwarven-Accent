@@ -250,10 +250,22 @@ end
 -- left-drag moves the icon around the minimap and saves its position.
 local function PlaceMinimapButton(angle)
     if not minimapButton or not Minimap then return end
+    -- Use the same positioning (including custom radius/map shape) as other
+    -- LibDBIcon buttons when that optional library is already loaded.
+    local dbIcon = LibStub and LibStub("LibDBIcon-1.0", true)
+    if dbIcon and dbIcon.SetButtonToPosition then
+        dbIcon:SetButtonToPosition(minimapButton, angle)
+        return
+    end
     local radians = math.rad(angle)
+    -- Match LibDBIcon's default orbit: button centers sit on the outer rim.
+    local width = Minimap.GetWidth and Minimap:GetWidth() or 140
+    local height = Minimap.GetHeight and Minimap:GetHeight() or 140
+    local radiusX = math.max(0, width) / 2 + 5
+    local radiusY = math.max(0, height) / 2 + 5
     minimapButton:ClearAllPoints()
     minimapButton:SetPoint("CENTER", Minimap, "CENTER",
-        math.cos(radians) * 80, math.sin(radians) * 80)
+        math.cos(radians) * radiusX, math.sin(radians) * radiusY)
 end
 
 function DA.ToggleConfig()
@@ -274,12 +286,28 @@ local function MakeMinimapButton()
     end
     local icon = minimapButton:CreateTexture(nil, "ARTWORK")
     icon:SetTexture("Interface\\Icons\\Trade_Mining")
-    icon:SetSize(21, 21)
-    icon:SetPoint("CENTER", minimapButton, "CENTER", 0, 0)
+    icon:SetTexCoord(0.05, 0.95, 0.05, 0.95)
+    if AddonCompartmentFrame then
+        icon:SetSize(18, 18)
+        icon:SetPoint("CENTER", minimapButton, "CENTER", 0, 0)
+    else
+        icon:SetSize(17, 17)
+        icon:SetPoint("TOPLEFT", minimapButton, "TOPLEFT", 7, -6)
+    end
     local border = minimapButton:CreateTexture(nil, "OVERLAY")
     border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
-    border:SetSize(53, 53)
-    border:SetPoint("CENTER", minimapButton, "CENTER", 11, -11)
+    local borderSize = AddonCompartmentFrame and 50 or 53
+    border:SetSize(borderSize, borderSize)
+    border:SetPoint("TOPLEFT", minimapButton, "TOPLEFT", 0, 0)
+    local background = minimapButton:CreateTexture(nil, "BACKGROUND")
+    background:SetTexture("Interface\\Minimap\\UI-Minimap-Background")
+    if AddonCompartmentFrame then
+        background:SetSize(24, 24)
+        background:SetPoint("CENTER", minimapButton, "CENTER", 0, 0)
+    else
+        background:SetSize(20, 20)
+        background:SetPoint("TOPLEFT", minimapButton, "TOPLEFT", 7, -5)
+    end
 
     minimapButton:RegisterForClicks("LeftButtonUp")
     minimapButton:RegisterForDrag("LeftButton")
@@ -325,6 +353,18 @@ local function MakeMinimapButton()
         or angle < 0 or angle >= 360 then angle = 225 end
     if DA.DB then DA.DB.minimapAngle = angle end
     PlaceMinimapButton(angle)
+    -- Other addons may finish configuring the minimap after ADDON_LOADED.
+    minimapButton:RegisterEvent("PLAYER_LOGIN")
+    minimapButton:SetScript("OnEvent", function(_, event)
+        if event == "PLAYER_LOGIN" then
+            PlaceMinimapButton(DA.DB and DA.DB.minimapAngle or 225)
+        end
+    end)
+    if Minimap.HookScript then
+        Minimap:HookScript("OnSizeChanged", function()
+            PlaceMinimapButton(DA.DB and DA.DB.minimapAngle or 225)
+        end)
+    end
 end
 
 function DA.InitOptions()
