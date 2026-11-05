@@ -270,3 +270,53 @@ eq(typographyCount, 1, "typographic phrase counts once")
 print("PASS: " .. count .. " total translation assertions")
 
 eq(transform("I’m ready. I’ve got gold. I’ll help. I’d go."), "Ah'm ready. Ah've got gold. Ah'll help. Ah'd go.", "explicit first-person contractions")
+
+-- Warcraft-inspired idioms: presets, toggles, safety and phrase precedence.
+local dwarvenCases = {
+    {2, "oh my god", "by my beard"},
+    {2, "oh my gosh", "by my beard"},
+    {2, "oh my goodness", "by my beard"},
+    {2, "my goodness", "by the forge"},
+    {2, "good heavens", "great mountains"},
+    {2, "thank god", "thank the ancestors"},
+    {2, "thank goodness", "thank the ancestors"},
+    {2, "for heaven's sake", "for the love o' the forge"},
+    {2, "for goodness sake", "for the love o' the forge"},
+    {2, "for goodness' sake", "for the love o' the forge"},
+    {3, "what the hell", "what in the deep forge"},
+    {3, "what on earth", "what in the mountain"},
+    {3, "holy crap", "great beards"},
+    {3, "holy shit", "great thundering beards"},
+    {3, "good luck", "may yer hammer strike true"},
+    {3, "stay safe", "keep yer feet on the ground"},
+    {3, "be careful", "mind yer footing"},
+    {3, "cheers to that", "ah'll raise a tankard tae that"},
+    {3, "let's get to work", "let's get the forge fired up"},
+    {3, "back to work", "back tae the anvil"},
+    {3, "job well done", "a fine bit o' craftsmanship"},
+    {3, "well done", "well forged"},
+    {3, "that's nonsense", "that's a load o' slag"},
+    {3, "that is nonsense", "that's a load o' slag"},
+    {3, "complete nonsense", "a load o' slag"},
+    {3, "i need a drink", "ah need a tankard o' ale"},
+    {3, "let's have a drink", "let's raise a tankard"},
+    {3, "over my dead body", "over ma cold, stone-dead body"},
+    {3, "you have my word", "ye have ma word as a dwarf"},
+    {3, "i swear", "by ma beard, ah swear"},
+}
+for _, item in ipairs(dwarvenCases) do
+    eq(transform(item[2] .. "!"), item[3] .. "!", "dwarf phrase: " .. item[2])
+    local subtle = {preset="Subtle"}
+    eq(DA.Transform(item[2], subtle), DA.Transform(item[2], {preset="Subtle",categories={dwarven=false}}), "Subtle keeps original voice")
+    if item[1] == 3 then
+        eq(DA.Transform(item[2], {preset="Balanced"}), DA.Transform(item[2], {preset="Balanced",categories={dwarven=false}}), "Heavy flavor stays out of Balanced")
+    end
+end
+eq(transform("Oh my god!"), "By my beard!", "dwarf phrase outranks oh")
+eq(transform("OH MY GOD!"), "BY MY BEARD!", "shouted dwarf phrase")
+eq(transform("Oh my god!", {categories={dwarven=false}}), "Och my god!", "dwarf category opt-out retains accent")
+eq(transform("Oh my god!", {disabledRules={["oh my god"]=true}}), "Och my god!", "individual dwarf phrase toggle")
+eq(transform("((oh my god)) [well done] https://example.com/stay-safe"), "((oh my god)) [well done] https://example.com/stay-safe", "dwarf flavor respects protected spans")
+eq(transform("god goddess beer stone forge ancestors"), "god goddess beer stone forge ancestors", "no blanket lore noun substitutions")
+eq(transform("Oh my god! Well done!", {maxChanges=1}), "By my beard! Well done!", "dwarf phrase counts as one change")
+print("PASS: " .. count .. " total translation assertions including dwarf idioms")

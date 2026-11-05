@@ -28,7 +28,7 @@ assert.ok(generated.phrases.some(p=>p.category==='Protected text' && p.text.incl
 assert.ok(generated.phrases.some(p=>p.text==='Good evening, boys and girls.'),
     'Greetings must contain untranslated boys and girls');
 
-assert.equal(generated.rules.length,124,'Expected complete vocabulary');
+assert.equal(generated.rules.length,154,'Expected complete vocabulary');
 const revised = [
   ['Hello, miss. Do you need a hand?', "Hello, lass. D'ye need a hand?"],
   ['Good evening, boys and girls.', 'Good evening, lads and lasses.'],
@@ -132,3 +132,161 @@ console.log('PASS: browser-only full-passage mode, in-game caps, markup, and fin
 console.log(`PASS: ${total} browser/Lua parity comparisons (${fromTsv.length} RP dialogues, ${edges.length} edge cases, 4 settings each)`);
 
 for (const [input, expected] of [["I don’t know where you’re going.","Ah dinnae ken where ye're going."],["I   do not know, thank   you!","Ah dinnae ken, thank ye!"],["You’d know your friend’s name.","You’d ken yer friend’s name."],["someone's little-known friend","someone's wee-known freend"],["'you' and 'friend'","'ye' and 'freend'"],["caféyou youé friendé éfriend","caféyou youé friendé éfriend"],["HTTPS://example.com/you/friend WWW.example.com/little you","HTTPS://example.com/you/friend WWW.example.com/little ye"],["((I don’t know)) [you’re] I don’t know","((I don’t know)) [you’re] Ah dinnae ken"]]) assert.equal(engine.transform(input,{preset:"Heavy"}).text,expected,"Typography and token safety: "+input);
+
+// Every dwarf idiom has an exact expected output as well as Lua parity coverage.
+for (const [tier, source, replacement] of [
+  [
+    2,
+    "oh my god",
+    "by my beard"
+  ],
+  [
+    2,
+    "oh my gosh",
+    "by my beard"
+  ],
+  [
+    2,
+    "oh my goodness",
+    "by my beard"
+  ],
+  [
+    2,
+    "my goodness",
+    "by the forge"
+  ],
+  [
+    2,
+    "good heavens",
+    "great mountains"
+  ],
+  [
+    2,
+    "thank god",
+    "thank the ancestors"
+  ],
+  [
+    2,
+    "thank goodness",
+    "thank the ancestors"
+  ],
+  [
+    2,
+    "for heaven's sake",
+    "for the love o' the forge"
+  ],
+  [
+    2,
+    "for goodness sake",
+    "for the love o' the forge"
+  ],
+  [
+    2,
+    "for goodness' sake",
+    "for the love o' the forge"
+  ],
+  [
+    3,
+    "what the hell",
+    "what in the deep forge"
+  ],
+  [
+    3,
+    "what on earth",
+    "what in the mountain"
+  ],
+  [
+    3,
+    "holy crap",
+    "great beards"
+  ],
+  [
+    3,
+    "holy shit",
+    "great thundering beards"
+  ],
+  [
+    3,
+    "good luck",
+    "may yer hammer strike true"
+  ],
+  [
+    3,
+    "stay safe",
+    "keep yer feet on the ground"
+  ],
+  [
+    3,
+    "be careful",
+    "mind yer footing"
+  ],
+  [
+    3,
+    "cheers to that",
+    "ah'll raise a tankard tae that"
+  ],
+  [
+    3,
+    "let's get to work",
+    "let's get the forge fired up"
+  ],
+  [
+    3,
+    "back to work",
+    "back tae the anvil"
+  ],
+  [
+    3,
+    "job well done",
+    "a fine bit o' craftsmanship"
+  ],
+  [
+    3,
+    "well done",
+    "well forged"
+  ],
+  [
+    3,
+    "that's nonsense",
+    "that's a load o' slag"
+  ],
+  [
+    3,
+    "that is nonsense",
+    "that's a load o' slag"
+  ],
+  [
+    3,
+    "complete nonsense",
+    "a load o' slag"
+  ],
+  [
+    3,
+    "i need a drink",
+    "ah need a tankard o' ale"
+  ],
+  [
+    3,
+    "let's have a drink",
+    "let's raise a tankard"
+  ],
+  [
+    3,
+    "over my dead body",
+    "over ma cold, stone-dead body"
+  ],
+  [
+    3,
+    "you have my word",
+    "ye have ma word as a dwarf"
+  ],
+  [
+    3,
+    "i swear",
+    "by ma beard, ah swear"
+  ]
+]) {
+  assert.equal(engine.transform(source+"!",{preset:"Heavy"}).text,replacement+"!");
+  assert.equal(engine.transform(source,{preset:"Subtle"}).text,engine.transform(source,{preset:"Subtle",categories:{dwarven:false}}).text);
+  if (tier===3) assert.equal(engine.transform(source,{preset:"Balanced"}).text,engine.transform(source,{preset:"Balanced",categories:{dwarven:false}}).text);
+}

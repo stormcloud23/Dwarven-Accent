@@ -48,7 +48,7 @@ You can safely switch editions by replacing the files in the `DwarvenAccent` dir
 ## Settings window
 
 - Preset buttons and an optional **manual substitution limit** (1–20). All presets default to **Unlimited**; use `+` to enable a cap (starting at 10), `+`/`-` to adjust, or **No limit** to disable it.
-- Enable/disable entire categories: phrases, contractions, pronouns, Scots words, everyday words, exclamations, strong language.
+- Enable/disable entire categories: phrases, contractions, pronouns, Scots words, everyday words, exclamations, dwarven expressions, strong language.
 - **Per-rule toggles** and a search box; rules now display their tier `[1]`, `[2]`, or `[3]`.
 - A **paged list with 11 reusable rows**, avoiding 100+ checkboxes created at once.
 - Muted row text indicates a rule excluded by the current preset or category; the checkbox still controls whether that individual rule is enabled.
@@ -56,6 +56,26 @@ You can safely switch editions by replacing the files in the `DwarvenAccent` dir
 - Reset all settings to defaults.
 
 Settings are stored account-wide in the game's `DwarvenAccentDB` SavedVariables. There are no external addon dependencies.
+
+## Dwarven expressions
+
+A separate **Dwarven expressions** category adds 30 Warcraft-inspired idioms.
+These are creative RP flavor, not claims of canonical dialogue. Subtle keeps
+these expressions unchanged; Balanced adds ten mild exclamations and Heavy adds
+all thirty. Disable the category or any individual phrase in settings.
+
+| English | Dwarf voice | Preset |
+| --- | --- | --- |
+| Oh my god! | By my beard! | Balanced / Heavy |
+| Thank goodness! | Thank the ancestors! | Balanced / Heavy |
+| Stay safe. | Keep yer feet on the ground. | Heavy |
+| Let's get to work. | Let's get the forge fired up. | Heavy |
+| That's nonsense. | That's a load o' slag. | Heavy |
+| I need a drink. | Ah need a tankard o' ale. | Heavy |
+| Good luck! | May yer hammer strike true! | Heavy |
+
+Only matching phrases change: item links, OOC text, place names and standalone
+words such as `god`, `beer` and `stone` keep their original wording.
 
 ## Translation behavior
 
@@ -141,7 +161,7 @@ vocabulary; game-specific integration remains unverified until Forever launches.
 
 ## Browser translation review tool (GitHub Pages)
 
-The Advanced branch includes a **browser-based review workshop** in [`docs/`](docs/index.html). It runs the Advanced 1.3 vocabulary, context checks, and preset limits on **270 realistic Warcraft RP phrases**, with full Subtle/Balanced/Heavy comparisons, search/filtering, highlighted replacements, flagging/approval, issue notes, and a custom-phrase tester. Browser reviews and custom examples are stored locally; use **Export review** to save a JSON file and **Import** to restore it elsewhere.
+The Advanced branch includes a **browser-based review workshop** in [`docs/`](docs/index.html). It runs the Advanced 1.3 vocabulary, context checks, and preset limits on **300 realistic Warcraft RP phrases**, with full Subtle/Balanced/Heavy comparisons, search/filtering, highlighted replacements, flagging/approval, issue notes, and a custom-phrase tester. Browser reviews and custom examples are stored locally; use **Export review** to save a JSON file and **Import** to restore it elsewhere.
 
 ### Long-message testing (Practice Hall)
 
