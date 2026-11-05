@@ -28,7 +28,7 @@ assert.ok(generated.phrases.some(p=>p.category==='Protected text' && p.text.incl
 assert.ok(generated.phrases.some(p=>p.text==='Good evening, boys and girls.'),
     'Greetings must contain untranslated boys and girls');
 
-assert.equal(generated.rules.length,120,'Expected complete vocabulary');
+assert.equal(generated.rules.length,124,'Expected complete vocabulary');
 const revised = [
   ['Hello, miss. Do you need a hand?', "Hello, lass. D'ye need a hand?"],
   ['Good evening, boys and girls.', 'Good evening, lads and lasses.'],
@@ -58,6 +58,14 @@ for (const [original, expected] of [
 assert.equal(engine.transform('bro guys dude',{preset:'Balanced'}).text,
   'bro guys dude','Conversational address words are Heavy-only');
 const edges = [
+    "I don’t know where you’re going.",
+    "I   do not know, thank   you!",
+    "You’d know your friend’s name.",
+    "someone's little-known friend",
+    "'you' and 'friend'",
+    "caféyou youé friendé éfriend",
+    "HTTPS://example.com/you/friend WWW.example.com/little you",
+    "((I don’t know)) [you’re] I don’t know",
     '[[you] friend] yes',
     'You |TInterface\\Icons\\INV_Misc_QuestionMark:0|t are my friend',
     'You |A:Ping:0:0|a know',
@@ -122,3 +130,5 @@ assert.equal(engine.transform(repeated,{preset:'Balanced',maxChanges:1,reviewUnl
   'Full review mode bypasses custom cap as well');
 console.log('PASS: browser-only full-passage mode, in-game caps, markup, and final-sentence coverage');
 console.log(`PASS: ${total} browser/Lua parity comparisons (${fromTsv.length} RP dialogues, ${edges.length} edge cases, 4 settings each)`);
+
+for (const [input, expected] of [["I don’t know where you’re going.","Ah dinnae ken where ye're going."],["I   do not know, thank   you!","Ah dinnae ken, thank ye!"],["You’d know your friend’s name.","You’d ken yer friend’s name."],["someone's little-known friend","someone's wee-known freend"],["'you' and 'friend'","'ye' and 'freend'"],["caféyou youé friendé éfriend","caféyou youé friendé éfriend"],["HTTPS://example.com/you/friend WWW.example.com/little you","HTTPS://example.com/you/friend WWW.example.com/little ye"],["((I don’t know)) [you’re] I don’t know","((I don’t know)) [you’re] Ah dinnae ken"]]) assert.equal(engine.transform(input,{preset:"Heavy"}).text,expected,"Typography and token safety: "+input);

@@ -14,6 +14,14 @@ end
 f:close()
 -- Corpus-aligned extras exercise invisible markup, punctuation, and precise rule controls.
 local edge = {
+    "I don’t know where you’re going.",
+    "I   do not know, thank   you!",
+    "You’d know your friend’s name.",
+    "someone's little-known friend",
+    "'you' and 'friend'",
+    "caféyou youé friendé éfriend",
+    "HTTPS://example.com/you/friend WWW.example.com/little you",
+    "((I don’t know)) [you’re] I don’t know",
     '[[you] friend] yes',
     'You |TInterface\\Icons\\INV_Misc_QuestionMark:0|t are my friend',
     'You |A:Ping:0:0|a know',

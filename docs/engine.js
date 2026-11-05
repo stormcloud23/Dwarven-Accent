@@ -13,7 +13,20 @@
     (indexed[first] ??= []).push({ ...rule, length: rule.source.length });
   }
   for (const rules of Object.values(indexed)) rules.sort((a,b) => b.length-a.length || a.tier-b.tier || a.source.localeCompare(b.source));
-  const isWord = ch => /[A-Za-z0-9_]/.test(ch || '') && (ch || '').length === 1;
+  const isWord = ch => /[A-Za-z0-9_\u0080-\uffff]/.test(ch || '') && (ch || '').length === 1;
+  const joinedApostrophe = (text, pos, direction) => /['’]/.test(text[pos] || '') && isWord(text[pos+direction]);
+  function matchSource(text, pos, source) {
+    for (const ch of source) {
+      if (ch === "'" && text[pos] === '’') pos++;
+      else if (ch === ' ') {
+        const space = /^\s+/.exec(text.slice(pos));
+        if (!space) return null;
+        pos += space[0].length;
+      } else if (text[pos] === ch) pos++;
+      else return null;
+    }
+    return pos;
+  }
   const nextWord = (text, last) => /^\s+([A-Za-z]+)/.exec(text.slice(last))?.[1] || null;
   const previousWord = (text, first) => /([A-Za-z']+)\s*$/.exec(text.slice(0, first))?.[1] || null;
   function visualNoun(text, last) {
@@ -91,8 +104,8 @@
       }
       return rest.length;
     }
-    if ((lead==='h' && rest.slice(0,4)==='http') || (lead==='w' && rest.slice(0,4)==='www.')) {
-      return (/^https?:\/\/[^\s]+/.exec(rest) || /^www\.[^\s]+/.exec(rest))?.[0].length || 0;
+    if (/^(https?:\/\/|www\.)/i.test(rest)) {
+      return (/^https?:\/\/[^\s]+/i.exec(rest) || /^www\.[^\s]+/i.exec(rest))?.[0].length || 0;
     }
     return 0;
   }
@@ -107,22 +120,22 @@
     let position=0, changes=0, pending='';
     while (position<text.length) {
       const bucket=indexed[lower[position]];
-      let selected=null, replacement=null;
-      if (bucket && changes<remaining && (position===0 || !isWord(text[position-1]))) {
+      let selected=null, replacement=null, selectedLast=null;
+      if (bucket && changes<remaining && (position===0 || !isWord(text[position-1])) && !joinedApostrophe(text,position-1,-1)) {
         for (const rule of bucket) {
-          const last=position+rule.length;
-          if (lower.slice(position,last)===rule.source && (last===text.length || !isWord(text[last])) &&
+          const last=matchSource(lower,position,rule.source);
+          if (last!==null && !joinedApostrophe(text,last,1) && (last===text.length || !isWord(text[last])) &&
               rule.tier<=preset.tier && settings.categories[rule.category]!==false && settings.disabledRules[rule.source]!==true) {
             const candidate = contextReplacement(rule,lower,position,last,text.slice(position,last));
-            if (candidate!==null) { selected=rule;replacement=candidate;break; }
+            if (candidate!==null) { selected=rule;replacement=candidate;selectedLast=last;break; }
           }
         }
       }
       if (selected) {
         pusher(pending);pending='';
-        const original=text.slice(position,position+selected.length);
+        const original=text.slice(position,selectedLast);
         pusher(matchCase(original,replacement),{changed:true,source:original,rule:selected.source});
-        position+=selected.length;
+        position=selectedLast;
         changes++;
       } else {
         pending+=text[position];position++;

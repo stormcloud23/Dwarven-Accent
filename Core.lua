@@ -35,7 +35,34 @@ function DA.LoadSettings()
 end
 
 local function IsWordChar(ch)
-    return ch ~= "" and ch:match("[%w_]") ~= nil
+    return ch ~= "" and (ch:match("[%w_]") ~= nil or ch:byte() >= 128)
+end
+
+-- Match typography without changing the original bytes or protected spans.
+local function MatchSource(text, pos, source)
+    for i = 1, #source do
+        local ch = source:sub(i, i)
+        if ch == "'" and text:sub(pos, pos + 2) == "’" then
+            pos = pos + 3
+        elseif ch == " " then
+            local _, last = text:find("^%s+", pos)
+            if not last then return nil end
+            pos = last + 1
+        elseif text:sub(pos, pos) == ch then
+            pos = pos + 1
+        else
+            return nil
+        end
+    end
+    return pos - 1
+end
+
+local function JoinedApostrophe(text, pos, direction)
+    local width = text:sub(pos, pos) == "'" and 1
+        or (text:sub(pos, pos + 2) == "’" and 3)
+    if not width then return false end
+    local adjacent = direction == 1 and pos + width or pos - 1
+    return IsWordChar(text:sub(adjacent, adjacent))
 end
 
 local function MatchCase(original, replacement)
@@ -214,27 +241,29 @@ local function TransformPlain(text, db, preset, remaining)
     if remaining <= 0 or text == "" then return text, 0 end
     local out, lower, pos, changes = {}, text:lower(), 1, 0
     while pos <= #text do
-        local selected, selectedReplacement
+        local selected, selectedReplacement, selectedLast
         local current = lower:sub(pos, pos)
         local bucket = indexed[current]
         if bucket and changes < remaining
-            and (pos == 1 or not IsWordChar(text:sub(pos - 1, pos - 1))) then
+            and (pos == 1 or not IsWordChar(text:sub(pos - 1, pos - 1)))
+            and not JoinedApostrophe(text, pos - 1, -1) then
             for _, rule in ipairs(bucket) do
-                local last = pos + rule.length - 1
-                if last <= #text and lower:sub(pos, last) == rule.source
+                local last = MatchSource(lower, pos, rule.source)
+                if last
                     and (last == #text or not IsWordChar(text:sub(last + 1, last + 1)))
+                    and not JoinedApostrophe(text, last + 1, 1)
                     and RuleAllowed(rule, db, preset) then
                     local replacement = ContextReplacement(rule, lower, pos, last, text:sub(pos, last))
                     if replacement then
-                        selected, selectedReplacement = rule, replacement
+                        selected, selectedReplacement, selectedLast = rule, replacement, last
                         break
                     end
                 end
             end
         end
         if selected then
-            out[#out + 1] = MatchCase(text:sub(pos, pos + selected.length - 1), selectedReplacement)
-            pos = pos + selected.length
+            out[#out + 1] = MatchCase(text:sub(pos, selectedLast), selectedReplacement)
+            pos = selectedLast + 1
             changes = changes + 1
         else
             out[#out + 1] = text:sub(pos, pos)
@@ -269,10 +298,10 @@ local function ProtectedLength(text, pos)
         span = rest:match("^%b[]")
         -- For unfinished item links, preserve the rest of the message.
         if not span then return #text - pos + 1 end
-    elseif (lead == "h" and text:sub(pos, pos + 3) == "http")
-        or (lead == "w" and text:sub(pos, pos + 3) == "www.") then
+    elseif (lead:lower() == "h" and text:sub(pos, pos + 3):lower() == "http")
+        or (lead:lower() == "w" and text:sub(pos, pos + 3):lower() == "www.") then
         rest = text:sub(pos)
-        span = rest:match("^https?://[^%s]+") or rest:match("^www%.[^%s]+")
+        span = rest:lower():match("^https?://[^%s]+") or rest:lower():match("^www%.[^%s]+")
     end
     return span and #span or nil
 end
